@@ -623,7 +623,7 @@ public class Project extends AppCompatActivity
                     }catch (JSONException e){
                         e.printStackTrace();
                     }
-                    mClient.senddata("login","session","1","","","","",jsonParam.toString());
+                    mClient.senddata("login","session","1","","","0",jsonParam.toString());
                     Log.i("sid",jsonParam.toString());
                     //mClient.senddata("login", "session","1","zh_CN", "" , "" , "",sid);
                     startHeartTimer(true);
@@ -665,9 +665,9 @@ public class Project extends AppCompatActivity
                 @Override
                 public void run() {
                     // TODO 自动生成的方法存根
-                    mClient.senddata("login", "heart-beat","1","zh_CN","" , "" , "","");
+                    mClient.senddata("login", "heart-beat","1","zh_CN","" , "0" , "");
                 }
-            }, 1000, 5000);
+            }, 1000, 60000);
         } else {
             _axTimer.cancel();
         }
@@ -699,7 +699,7 @@ public class Project extends AppCompatActivity
             }catch (JSONException e){
                 e.printStackTrace();
             }
-            mClient.senddata("login","session","1","","","","",jsonParam.toString());
+            mClient.senddata("login","session","1","","","0",jsonParam.toString());
             Log.i("sid test",jsonParam.toString());
             //mClient.senddata("login", "session","1","zh_CN", "" , "" , "",sid);
             if(mClient.isOpen()==true) {
@@ -796,10 +796,10 @@ public class Project extends AppCompatActivity
             return result;
         }
 
-        public void senddata(String cmd,String ctrl,String version,String lang,String cuid,String ctype,String data,String sid){
+        public void senddata(String cmd,String ctrl,String version,String lang,String cuid,String ctype,String data){
 
             String type = cmd + "|" + ctrl + "|" + version + "|" + getNextMappingIndex();
-            String message = "0|" + type + "|1||" + lang + "|" + cuid + "|" + ctype + "|" + data+"|"+sid;
+            String message = "0|" + type + "|1||" + lang + "|" + cuid + "|" + ctype + "|" + data;
 
             FramedataImpl1 resp = new FramedataImpl1(Framedata.Opcode.TEXT);
             //System.out.println("=============WebSocket send:" + message);
@@ -807,7 +807,7 @@ public class Project extends AppCompatActivity
                 resp.setFin(true);
                 ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
                 resp.setPayload(buffer);
-                //Log.i("message test", resp.toString());
+                Log.i("message test", message);
                 mClient.sendFrame(resp);
                 /**
                  * WSManager.notifySocketEvent(new WSocketEvent(_self,WSEventType.WS_SEND, message));
