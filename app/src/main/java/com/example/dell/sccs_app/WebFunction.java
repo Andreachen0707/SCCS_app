@@ -317,10 +317,10 @@ public class WebFunction {
             return result;
         }
 
-        public void senddata(String cmd,String ctrl,String version,String cuid,String ctype,String data){
+        public void senddata(String cmd,String ctrl,String version,String cuid,String ctype,String data,String sid){
 
             String type = cmd + "|" + ctrl + "|" + version + "|" + getNextMappingIndex();
-            String message = "0|" + type + "|1||" + "zh_CN" + "|" + cuid + "|" + ctype + "|" + data;
+            String message = "0|" + type + "|1||" + "zh_CN" + "|" + cuid + "|" + ctype + "|" + data+"|"+ sid;
 
             FramedataImpl1 resp = new FramedataImpl1(Framedata.Opcode.TEXT);
             //System.out.println("=============WebSocket send:" + message);
@@ -410,7 +410,7 @@ public class WebFunction {
                     }catch (JSONException e){
                         e.printStackTrace();
                     }
-                    mClient.senddata("login","add-listener","1","","",jsonParam.toString());
+                    mClient.senddata("login","add-listener","1","","",jsonParam.toString(),"");
                 }
                 else
                     Log.i("Test new","fail");
