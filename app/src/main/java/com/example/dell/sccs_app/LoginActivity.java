@@ -47,6 +47,7 @@ import static android.Manifest.permission.READ_CONTACTS;
 import static com.example.dell.sccs_app.Add.password;
 import static com.example.dell.sccs_app.Add.user;
 import static com.example.dell.sccs_app.LoginProcess.urltest;
+import static com.example.dell.sccs_app.StaticValue.basicURL;
 import static com.example.dell.sccs_app.StaticValue.sid;
 import static com.example.dell.sccs_app.StaticValue.connectState;
 import static com.example.dell.sccs_app.StaticValue.connectUrl;
@@ -58,12 +59,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     //private WebSocketConnection mConnect = new WebSocketConnection();
     private String AXWEBSID;
-
-
-    private static final String wsurl = "ws://172.16.50.126:8080/websocketServer"; //服务器地址
-    private static final String url1 = "http://192.168.1.68:6080/web/user/login/api.html?skey=76939448406E5A46C4736873DB829A36BF73DB8D2BC8816405CB9B7BFB9969A8C8B0F31BED1E53B2758C2711690C0829E2BBD2564C1A14183C82B800A5DE8874&lang=zh_CN";
-    private static final String url2 = "http://localhost:80/web/user/login/api.html?skey=76939448406E5A46C4736873DB829A36BF73DB8D2BC8816405CB9B7BFB9969A8C8B0F31BED1E53B2758C2711690C0829E2BBD2564C1A14183C82B800A5DE8874&lang=zh_CN";
-    private static final String url3 = "http://121.40.34.92:7070/web/";
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -87,6 +82,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
     private TextView mResultTextView;
+    public static String connectURL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +92,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         Toolbar toolbar=(Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
+        Log.i("basic url test",basicURL);
 
         //login
         //connect();
@@ -382,7 +379,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         public void run() {
             // TODO
 
-            AXWEBSID = LoginProcess.logon(connectUrl,user,password);
+            AXWEBSID = LoginProcess.logon(connectURL,user,password);
             Message msg = new Message();
             Bundle data = new Bundle();
             data.putString("value", AXWEBSID);

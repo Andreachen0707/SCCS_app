@@ -14,12 +14,18 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static com.example.dell.sccs_app.StaticValue.basicURL;
+import static com.example.dell.sccs_app.StaticValue.set_port;
+
 
 public class Setting extends AppCompatActivity {
 
     private RadioGroup listgroup;
     private ImageButton add;
+    private RadioButton server1;
+    private RadioButton server2;
     private TextView test = null;
+    private String port = null;
 
     public static int dip2px(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
@@ -38,12 +44,17 @@ public class Setting extends AppCompatActivity {
         listgroup = (RadioGroup) findViewById(R.id.ServeGroup);
         test = (TextView) findViewById(R.id.test);
         add=(ImageButton)findViewById(R.id.btnright);
+        server1 = (RadioButton)findViewById(R.id.serve1);
+
+        server1.setText(set_port);
 
         toolbarsetting.setNavigationIcon(R.drawable.ic_action_back);
         toolbarsetting.setNavigationOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
+                basicURL = "http://"+ port;
                 Intent intent = new Intent(Setting.this,LoginActivity.class);
+                LoginActivity.connectURL = basicURL+"/api/json?cmd=login&ctrl=user&version=1&lang=zh_CN";
                 startActivity(intent);
                 Toast.makeText(Setting.this,"UP",Toast.LENGTH_SHORT).show();
             }
@@ -64,6 +75,7 @@ public class Setting extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
                 int radioButtonId = group.getCheckedRadioButtonId();
                 RadioButton now = (RadioButton)Setting.this.findViewById(radioButtonId);
+                port = now.getText().toString();
                 test.setText(now.getText());
             }
         });

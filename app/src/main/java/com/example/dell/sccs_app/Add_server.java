@@ -36,7 +36,7 @@ public class Add_server extends AppCompatActivity {
                 intent.setClass(Add_server.this, Setting.class);
 
                 Bundle bundle= new Bundle();
-                bundle.putString("server",Address+" : "+Port);
+                bundle.putString("server",Address+":"+Port);
                 intent.putExtras(bundle);
                 setResult(0x2,intent);
                 finish();
