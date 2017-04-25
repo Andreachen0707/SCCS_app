@@ -611,21 +611,23 @@ public class Project extends AppCompatActivity
             if(type=="1"){
                 mClient = new WebClient(uri,draft);
                 mClient.connect();
-                startHeartTimer(true);
                 if(mClient.isOpen()==true) {
-                    mClient.senddata("login", "heart-beat","1", "" , "" , "",sid);
-                    startHeartTimer(true);
                     Log.i("Test new","Success");
-                    /*JSONObject jsonParam = new JSONObject();
+                    JSONObject jsonParam = new JSONObject();
                     try {
-                        jsonParam.put("cmd", "push-lcu");
+                        /*jsonParam.put("cmd", "push-lcu");
                         jsonParam.put("ctrl", "action");
-                        jsonParam.put("ver", "1");
+                        jsonParam.put("ver", "1");*/
+                        jsonParam.put("sid", sid);
 
                     }catch (JSONException e){
                         e.printStackTrace();
                     }
-                    mClient.senddata("login","add-listener","1","","",jsonParam.toString(),"");*/
+                    mClient.senddata("login","session","1","","","","",jsonParam.toString());
+                    Log.i("sid",jsonParam.toString());
+                    //mClient.senddata("login", "session","1","zh_CN", "" , "" , "",sid);
+                    startHeartTimer(true);
+
                 }
                 else
                     Log.i("Test new","fail");
@@ -663,7 +665,7 @@ public class Project extends AppCompatActivity
                 @Override
                 public void run() {
                     // TODO 自动生成的方法存根
-                    mClient.sendMessage("login", "heart-beat","1", "" , "" , "");
+                    mClient.senddata("login", "heart-beat","1","zh_CN","" , "" , "","");
                 }
             }, 1000, 5000);
         } else {
@@ -687,6 +689,19 @@ public class Project extends AppCompatActivity
         @Override
         public void onOpen(ServerHandshake handShakeData) {
             Log.i("handshake","success");
+            JSONObject jsonParam = new JSONObject();
+            try {
+                        /*jsonParam.put("cmd", "push-lcu");
+                        jsonParam.put("ctrl", "action");
+                        jsonParam.put("ver", "1");*/
+                jsonParam.put("sid",""+sid+"");
+
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+            mClient.senddata("login","session","1","","","","",jsonParam.toString());
+            Log.i("sid test",jsonParam.toString());
+            //mClient.senddata("login", "session","1","zh_CN", "" , "" , "",sid);
             if(mClient.isOpen()==true) {
                 startHeartTimer(true);
             }
@@ -781,10 +796,10 @@ public class Project extends AppCompatActivity
             return result;
         }
 
-        public void senddata(String cmd,String ctrl,String version,String cuid,String ctype,String data,String sid){
+        public void senddata(String cmd,String ctrl,String version,String lang,String cuid,String ctype,String data,String sid){
 
             String type = cmd + "|" + ctrl + "|" + version + "|" + getNextMappingIndex();
-            String message = "0|" + type + "|1||" + "zh_CN" + "|" + cuid + "|" + ctype + "|" + data;
+            String message = "0|" + type + "|1||" + lang + "|" + cuid + "|" + ctype + "|" + data+"|"+sid;
 
             FramedataImpl1 resp = new FramedataImpl1(Framedata.Opcode.TEXT);
             //System.out.println("=============WebSocket send:" + message);
@@ -792,6 +807,7 @@ public class Project extends AppCompatActivity
                 resp.setFin(true);
                 ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
                 resp.setPayload(buffer);
+                //Log.i("message test", resp.toString());
                 mClient.sendFrame(resp);
                 /**
                  * WSManager.notifySocketEvent(new WSocketEvent(_self,WSEventType.WS_SEND, message));
