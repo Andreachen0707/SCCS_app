@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.dell.sccs_app.Project">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.NoActionBar.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/content_project" />
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/addItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_gravity = "bottom"
+        android:layout_margin="@dimen/fab_margin"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        app:fab_icon="@android:drawable/ic_dialog_email"
+        app:fab_addButtonColorNormal="@android:color/black"
+        app:fab_addButtonColorPressed="@android:color/darker_gray"
+        app:fab_addButtonSize="normal"
+        app:fab_labelStyle="@style/menu_labels_style"
+        app:fab_labelsPosition="right"
+        app:fab_expandDirection="up"
+        >
+        <!--切换街道图按钮-->
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addItemLamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            app:fab_icon="@android:drawable/ic_dialog_email"
+            app:fab_colorNormal="@android:color/holo_blue_dark"
+            app:fab_colorPressed="@android:color/holo_blue_bright"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addItemControl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="@android:color/white"
+            app:fab_colorPressed="@android:color/darker_gray"
+            app:fab_size="mini"
+            app:fab_title="FAB 2" />
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@drawable/ic_scan" />
+
+</android.support.design.widget.CoordinatorLayout>
