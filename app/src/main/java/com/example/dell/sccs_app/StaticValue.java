@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class StaticValue {
     public static boolean connectState = false;
     public static String set_port = "121.40.34.92:7070";
-    public static String basicURL = "http://";
+    public static String basicURL = "http://"+set_port;
     public static String connectUrl = basicURL+"/api/json?cmd=login&ctrl=user&version=1&lang=zh_CN";
     public static String sid;
     public static String heartUrl = "http://121.40.34.92:7070/api/json?cmd=login&ctrl=heart-beat&version=1&lang=zh_CN&sid=";
