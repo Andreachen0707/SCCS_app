@@ -143,6 +143,7 @@ final class CameraConfigurationManager {
     Camera theCamera = camera.getCamera();
     Camera.Parameters parameters = theCamera.getParameters();
 
+
     if (parameters == null) {
       Log.w(TAG, "Device error: no camera parameters are available. Proceeding without configuration.");
       return;
@@ -183,9 +184,11 @@ final class CameraConfigurationManager {
 
     parameters.setPreviewSize(bestPreviewSize.x, bestPreviewSize.y);
 
+
     theCamera.setParameters(parameters);
 
     theCamera.setDisplayOrientation(cwRotationFromDisplayToCamera);
+    theCamera.setDisplayOrientation(90);
 
     Camera.Parameters afterParameters = theCamera.getParameters();
     Camera.Size afterSize = afterParameters.getPreviewSize();
