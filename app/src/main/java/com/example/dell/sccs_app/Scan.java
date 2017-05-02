@@ -149,11 +149,11 @@ public class Scan extends AppCompatActivity {
                     String result = bundle.getString("scan_result");
                     scanResult.setText(result);
 
-                    String [] temp = null;
-                    temp = result.split("@");
+                   // String [] temp = null;
+                  //  temp = result.split("@");
 
-                    NAME.setText(temp[0]);
-                    UID.setText(temp[1]);
+                   // NAME.setText(temp[0]);
+                   // UID.setText(temp[1]);
 
                     WebView browser = (WebView) findViewById(R.id.Towebtest);
                     browser.loadUrl(result);

@@ -85,6 +85,7 @@ import static com.example.dell.sccs_app.StaticValue.askElectricUrl;
 import static com.example.dell.sccs_app.StaticValue.askProjectListUrl;
 import static com.example.dell.sccs_app.StaticValue.askStationListUrl;
 import static com.example.dell.sccs_app.StaticValue.deviceListData;
+import static com.example.dell.sccs_app.StaticValue.logout;
 import static com.example.dell.sccs_app.StaticValue.projectData;
 import static com.example.dell.sccs_app.StaticValue.projectTemp;
 import static com.example.dell.sccs_app.StaticValue.sendUrl;
@@ -273,6 +274,10 @@ public class Project extends AppCompatActivity
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_manage) {
+            connectType = 7;
+            MyThread2 m4 = new MyThread2();
+            m4.setName(connectType);
+            new Thread(m4).start();
             Intent intent= new Intent();
             intent.setClass(Project.this,LoginActivity.class);
             startActivity(intent);
@@ -411,25 +416,27 @@ public class Project extends AppCompatActivity
             Log.i("mylog", "请求结果为-->" + val);
             // TODO
             // UI界面的更新等相关操作
-           // Log.i("fuck",type);
-            if(val.charAt(0)=='1')
-            {
-                if(val.charAt(3)!='['){
-                    StringBuffer sb = new StringBuffer();
-                    String input= "[";
-                    String output = "]";
-                    val = val.substring(3);
-                    sb.append(input).append(val).append(output);
+           Log.i("fuck",type);
+            if(type!= "7") {
+                if (val.charAt(0) == '1') {
+                    if (val.charAt(3) != '[') {
+                        StringBuffer sb = new StringBuffer();
+                        String input = "[";
+                        String output = "]";
+                        val = val.substring(3);
+                        sb.append(input).append(val).append(output);
 
-                    val = sb.toString();
-                    Log.i("typ2",val);
+                        val = sb.toString();
+                        Log.i("typ2", val);
+                    } else {
+                        val = val.substring(3);
+                        Log.i("typ1", val);
+                    }
+                    jsonTranslate(val, Integer.parseInt(type));
                 }
-                else{
-                    val = val.substring(3);
-                    Log.i("typ1",val);
-                }
-                jsonTranslate(val,Integer.parseInt(type));
             }
+            else
+                Log.i("Log out","true");
         }
     };
 
@@ -508,6 +515,9 @@ public class Project extends AppCompatActivity
             case 6:
                 link = stationquery;
                 body = "{\"wheres\":[{\"k\":\"stationId\",\"o\":\"=\",\"v\":\"a5cff7fddf19414289ea8d6959e1021b\"}],\"orders\":[]}";
+                break;
+            case 7:
+                link = logout;
                 break;
             default:
                 break;
