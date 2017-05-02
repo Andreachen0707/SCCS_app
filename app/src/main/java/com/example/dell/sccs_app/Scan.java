@@ -149,10 +149,10 @@ public class Scan extends AppCompatActivity {
                     scanResult.setText(result);
 
                     String [] temp = null;
-                    temp = result.split("@");
+                    //temp = result.split("@");
 
-                    NAME.setText(temp[0]);
-                    UID.setText(temp[1]);
+                    //NAME.setText(temp[0]);
+                    //UID.setText(temp[1]);
 
                     WebView browser = (WebView) findViewById(R.id.Towebtest);
                     browser.loadUrl(result);
@@ -170,9 +170,7 @@ public class Scan extends AppCompatActivity {
             }
         }
 
-        else if (resultCode == RESULT_CANCELED) {
-            //  scanResult.setText("没有扫描出结果");
-        }
+
     }
 
 

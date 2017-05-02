@@ -143,7 +143,7 @@ public class Project extends AppCompatActivity
 
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        //mapFragment.getMapAsync(this);
 
         Button scan = (Button)findViewById(R.id.scan);
         scan.setOnClickListener(new View.OnClickListener() {
