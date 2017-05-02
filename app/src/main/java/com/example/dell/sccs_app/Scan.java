@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -149,10 +150,10 @@ public class Scan extends AppCompatActivity {
                     scanResult.setText(result);
 
                     String [] temp = null;
-                    //temp = result.split("@");
+                    temp = result.split("@");
 
-                    //NAME.setText(temp[0]);
-                    //UID.setText(temp[1]);
+                    NAME.setText(temp[0]);
+                    UID.setText(temp[1]);
 
                     WebView browser = (WebView) findViewById(R.id.Towebtest);
                     browser.loadUrl(result);
@@ -169,6 +170,8 @@ public class Scan extends AppCompatActivity {
                 }
             }
         }
+        else
+            Log.i("result","fail");
 
 
     }

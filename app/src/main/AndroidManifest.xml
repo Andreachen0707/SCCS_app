@@ -208,6 +208,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".Project_test"
+            android:label="@string/title_activity_project_test"></activity>
     </application>
 
 </manifest>

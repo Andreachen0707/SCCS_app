@@ -140,10 +140,8 @@ public class Project extends AppCompatActivity
 
 
 
-
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        //mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync(Project.this);
 
         Button scan = (Button)findViewById(R.id.scan);
         scan.setOnClickListener(new View.OnClickListener() {
@@ -610,10 +608,10 @@ public class Project extends AppCompatActivity
 
         try {
             URI uri = new URI(address);
-            if(type=="1"){
+            if(type == "1"){
                 mClient = new WebClient(uri,draft);
                 mClient.connect();
-                if(mClient.isOpen()==true) {
+                if(mClient.isOpen()) {
                     Log.i("Test new","Success");
                     JSONObject jsonParam = new JSONObject();
                     try {

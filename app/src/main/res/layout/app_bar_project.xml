@@ -17,14 +17,12 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay">
-
         </android.support.v7.widget.Toolbar>
-
-
 
 
     </android.support.design.widget.AppBarLayout>
 
+    <include layout="@layout/content_project" />
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/addItem"

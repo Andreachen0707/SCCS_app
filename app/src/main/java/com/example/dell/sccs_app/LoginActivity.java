@@ -146,10 +146,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         tempt.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setClass(LoginActivity.this,Add.class);
-                //intent.putExtra("url",url3);
-                startActivity(intent);
+
             }
         });
 
