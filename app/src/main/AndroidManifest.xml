@@ -210,7 +210,10 @@
         </activity>
         <activity
             android:name=".Project_test"
-            android:label="@string/title_activity_project_test"></activity>
+            android:label="@string/title_activity_project_test" />
+        <activity
+            android:name=".Add_lamp"
+            android:label="@string/title_activity_add_lamp"></activity>
     </application>
 
 </manifest>

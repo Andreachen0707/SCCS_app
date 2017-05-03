@@ -1,4 +1,4 @@
-package com.example.dell.sccs_app;
+package com.example.dell.sccs_app.Util;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;

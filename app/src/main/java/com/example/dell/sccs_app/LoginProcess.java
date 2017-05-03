@@ -1,10 +1,11 @@
 package com.example.dell.sccs_app;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.CookieSyncManager;
+
+import com.example.dell.sccs_app.Util.Md5Util;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -27,15 +28,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 

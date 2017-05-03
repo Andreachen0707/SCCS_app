@@ -1,5 +1,6 @@
 package com.example.dell.sccs_app;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +9,8 @@ import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,11 +20,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.example.dell.sccs_app.Bean.DeviceListBean;
 import com.example.dell.sccs_app.Bean.ElectricListBean;
 import com.example.dell.sccs_app.Bean.ProjectBean;
+import com.example.dell.sccs_app.Util.DensityUtil;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -141,8 +147,8 @@ public class Project extends AppCompatActivity
 
 
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(Project.this);
+        /*SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(Project.this);*/
 
         Button scan = (Button)findViewById(R.id.scan);
         scan.setOnClickListener(new View.OnClickListener() {
@@ -205,10 +211,10 @@ public class Project extends AppCompatActivity
         addaction.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                Intent intent = new Intent(Project.this,Add.class);
-                startActivity(intent);
+                Add_show();
             }
         });
+
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -219,6 +225,19 @@ public class Project extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void Add_show(){
+        Dialog bottomDialog = new Dialog(this, R.style.BottomDialog);
+        View contentView = LayoutInflater.from(this).inflate(R.layout.activity_add_lamp, null);
+        bottomDialog.setContentView(contentView);
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) contentView.getLayoutParams();
+        params.width = getResources().getDisplayMetrics().widthPixels - DensityUtil.dp2px(this, 16f);
+        params.bottomMargin = DensityUtil.dp2px(this, 8f);
+        contentView.setLayoutParams(params);
+        bottomDialog.getWindow().setGravity(Gravity.BOTTOM);
+        bottomDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
+        bottomDialog.show();
     }
 
     @Override
@@ -416,8 +435,11 @@ public class Project extends AppCompatActivity
             Log.i("mylog", "请求结果为-->" + val);
             // TODO
             // UI界面的更新等相关操作
-           Log.i("fuck",type);
-            if(type!= "7") {
+                Log.i("fuck",type);
+            if("".equals(val))
+                Log.i("Log out","true");
+
+            else {
                 if (val.charAt(0) == '1') {
                     if (val.charAt(3) != '[') {
                         StringBuffer sb = new StringBuffer();
@@ -425,7 +447,6 @@ public class Project extends AppCompatActivity
                         String output = "]";
                         val = val.substring(3);
                         sb.append(input).append(val).append(output);
-
                         val = sb.toString();
                         Log.i("typ2", val);
                     } else {
@@ -435,8 +456,8 @@ public class Project extends AppCompatActivity
                     jsonTranslate(val, Integer.parseInt(type));
                 }
             }
-            else
-                Log.i("Log out","true");
+
+
         }
     };
 

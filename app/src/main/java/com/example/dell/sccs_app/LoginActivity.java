@@ -127,7 +127,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
+                    //attemptLogin();
                     return true;
                 }
                 return false;
@@ -146,7 +146,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         tempt.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent  = new Intent();
+                intent.setClass(LoginActivity.this,Project.class);
+                startActivity(intent);
             }
         });
 
