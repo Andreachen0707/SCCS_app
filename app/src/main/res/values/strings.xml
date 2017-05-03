@@ -46,5 +46,7 @@
     <string name="title_notifications">Notifications</string>
 
     <!--Strings related to scan-->
+    <string name="instruction_1"> 手动输入 </string>
+    <string name="instruction_2"> 扫描输入 </string>
 
 </resources>

@@ -202,8 +202,9 @@ public class Project extends AppCompatActivity
             public void onClick(View view) {
                 /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();*/
-                Intent scan = new Intent(Project.this,Scan.class);
-                startActivity(scan);
+                /*Intent scan = new Intent(Project.this,Scan.class);
+                startActivity(scan);*/
+                Add_show();
             }
         });
 
@@ -228,16 +229,9 @@ public class Project extends AppCompatActivity
     }
 
     private void Add_show(){
-        Dialog bottomDialog = new Dialog(this, R.style.BottomDialog);
-        View contentView = LayoutInflater.from(this).inflate(R.layout.activity_add_lamp, null);
-        bottomDialog.setContentView(contentView);
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) contentView.getLayoutParams();
-        params.width = getResources().getDisplayMetrics().widthPixels - DensityUtil.dp2px(this, 16f);
-        params.bottomMargin = DensityUtil.dp2px(this, 8f);
-        contentView.setLayoutParams(params);
-        bottomDialog.getWindow().setGravity(Gravity.BOTTOM);
-        bottomDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
-        bottomDialog.show();
+        Intent intent = new Intent();
+        intent.setClass(this,Add_lamp.class);
+        startActivity(intent);
     }
 
     @Override

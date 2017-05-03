@@ -46,11 +46,10 @@ import java.util.Map;
 import static android.Manifest.permission.READ_CONTACTS;
 import static com.example.dell.sccs_app.Add.password;
 import static com.example.dell.sccs_app.Add.user;
-import static com.example.dell.sccs_app.LoginProcess.urltest;
 import static com.example.dell.sccs_app.StaticValue.basicURL;
 import static com.example.dell.sccs_app.StaticValue.sid;
 import static com.example.dell.sccs_app.StaticValue.connectState;
-import static com.example.dell.sccs_app.StaticValue.connectUrl;
+import static com.example.dell.sccs_app.StaticValue.connectURL;
 
 /**
  * A login screen that offers login via email/password.
@@ -82,7 +81,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
     private TextView mResultTextView;
-    public static String connectURL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +90,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         Toolbar toolbar=(Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
-        Log.i("basic url test",basicURL);
+        Log.i("basic url test",connectURL);
 
         //login
         //connect();

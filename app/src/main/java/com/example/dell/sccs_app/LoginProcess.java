@@ -295,7 +295,6 @@ public class LoginProcess extends AppCompatActivity {
         {
             sid = axWebSID;
             connectState = true;
-            // System.out.print("fuck");
         }
         return axWebSID;
     }

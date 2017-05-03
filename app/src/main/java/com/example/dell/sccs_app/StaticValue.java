@@ -14,7 +14,7 @@ public class StaticValue {
     public static boolean connectState = false;
     public static String set_port = "121.40.34.92:7070";
     public static String basicURL = "http://"+set_port;
-    public static String connectUrl = basicURL+"/api/json?cmd=login&ctrl=user&version=1&lang=zh_CN";
+    public static String connectURL = basicURL+"/api/json?cmd=login&ctrl=user&version=1&lang=zh_CN";
     public static String sid;
     public static String logout = "http://121.40.34.92:7070/api/json?cmd=login&ctrl=logout&version=1&lang=zh_CN&sid=";
     public static String heartUrl = "http://121.40.34.92:7070/api/json?cmd=login&ctrl=heart-beat&version=1&lang=zh_CN&sid=";

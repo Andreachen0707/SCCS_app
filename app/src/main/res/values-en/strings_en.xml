@@ -149,5 +149,8 @@
     <string name="sbc_name">Google Book Search</string>
     <string name="wifi_changing_network">Requesting connection to network\u2026</string>
 
+    <!--Strings related to scan-->
+    <string name="instruction_1"> Input </string>
+    <string name="instruction_2"> Scan </string>
 
 </resources>

@@ -11,7 +11,9 @@
 
     <dimen name="text_view">16dp</dimen>
 
-    <dimen name="fab_size_normal">100dp</dimen>
+
+    <dimen name="fab_size_mini">56dp</dimen>
+    <dimen name="fab_size_normal">80dp</dimen>
 
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->

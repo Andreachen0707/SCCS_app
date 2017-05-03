@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import static com.example.dell.sccs_app.StaticValue.basicURL;
 import static com.example.dell.sccs_app.StaticValue.set_port;
+import static com.example.dell.sccs_app.StaticValue.connectURL;
 
 
 public class Setting extends AppCompatActivity {
@@ -54,7 +55,7 @@ public class Setting extends AppCompatActivity {
             public void onClick(View v){
                 basicURL = "http://"+ port;
                 Intent intent = new Intent(Setting.this,LoginActivity.class);
-                LoginActivity.connectURL = basicURL+"/api/json?cmd=login&ctrl=user&version=1&lang=zh_CN";
+                connectURL = basicURL+"/api/json?cmd=login&ctrl=user&version=1&lang=zh_CN";
                 startActivity(intent);
                 Toast.makeText(Setting.this,"UP",Toast.LENGTH_SHORT).show();
             }

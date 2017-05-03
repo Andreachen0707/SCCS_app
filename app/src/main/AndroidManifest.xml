@@ -55,6 +55,12 @@
             android:label="@string/title_activity_maps"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name=".Add_lamp"
+            android:label=""
+            android:theme="@style/BottomDialog"
+            ></activity>
+
         <!--
        Activity for scan
        android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
@@ -208,12 +214,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".Project_test"
-            android:label="@string/title_activity_project_test" />
-        <activity
-            android:name=".Add_lamp"
-            android:label="@string/title_activity_add_lamp"></activity>
+
     </application>
 
 </manifest>

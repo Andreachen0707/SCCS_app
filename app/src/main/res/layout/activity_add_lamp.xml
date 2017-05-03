@@ -4,33 +4,60 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/shape_dialog"
-    android:orientation="vertical">
+    android:orientation="horizontal"
+    android:weightSum="1">
 
-    <ImageButton
-        android:id="@+id/input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:drawableStart="@drawable/ic_action_settings"
-        android:drawablePadding="16dp"
-        android:gravity="center_vertical"
-        android:padding="16dp"
-        android:text="tag"
-        android:textColor="#666666"
-        android:textSize="14sp"/>
-
-    <ImageButton
-        android:id="@+id/scan"
-        android:layout_gravity="center"
-        android:gravity="center"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/ButtonAction"
-        android:text="@string/language"
-        android:textColor="@android:color/white"
-        android:textSize="20sp"
-        android:textStyle="normal"/>
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_weight="0.5">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            app:fab_icon="@drawable/ic_icon_input"
+            app:fab_size="normal"
+            app:fab_colorNormal="@color/button_input"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:text="@string/instruction_1"
+            android:textColor="@color/instruction"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_weight="0.5">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/scan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            app:fab_icon="@drawable/ic_icon_scan"
+            app:fab_size="normal"
+            app:fab_colorNormal="@color/button_scan"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:text="@string/instruction_2"
+            android:textColor="@color/instruction"
+            />
+    </LinearLayout>
+
 
 
 
