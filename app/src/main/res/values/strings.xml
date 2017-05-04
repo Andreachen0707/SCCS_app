@@ -49,4 +49,9 @@
     <string name="instruction_1"> 手动输入 </string>
     <string name="instruction_2"> 扫描输入 </string>
 
+    <!--Strings related to tabs-->
+    <string name="list"> 项目列表 </string>
+    <string name="map"> 地图 </string>
+    <string name="history"> 历史 </string>
+
 </resources>

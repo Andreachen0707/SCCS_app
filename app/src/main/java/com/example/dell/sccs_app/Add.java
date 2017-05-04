@@ -58,8 +58,8 @@ public class Add extends AppCompatActivity {
 
     private static final String url = "ws://121.40.34.92:7070/api/ws";
     public static final String logURL = "http://121.40.34.92:7070/api/json?cmd=login&ctrl=user&version=1&lang=zh_CN";
-    public static final String user = "snow";
-    public static final String password = "snow.chen";
+    //public static final String user = "snow";
+    //public static final String password = "snow.chen";
     //private String ws = "ws://121.40.34.92:7070/api/ws";
 
     @Override

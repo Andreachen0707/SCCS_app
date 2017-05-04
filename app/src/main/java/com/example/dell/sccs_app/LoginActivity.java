@@ -43,9 +43,11 @@ import java.util.List;
 import java.util.Map;
 
 
+import dym.unique.com.springinglayoutlibrary.handler.SpringingNotificationRotateHandler;
+import dym.unique.com.springinglayoutlibrary.handler.SpringingTouchScaleHandler;
+import dym.unique.com.springinglayoutlibrary.view.SpringingImageView;
+
 import static android.Manifest.permission.READ_CONTACTS;
-import static com.example.dell.sccs_app.Add.password;
-import static com.example.dell.sccs_app.Add.user;
 import static com.example.dell.sccs_app.StaticValue.basicURL;
 import static com.example.dell.sccs_app.StaticValue.sid;
 import static com.example.dell.sccs_app.StaticValue.connectState;
@@ -76,11 +78,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
+    private AutoCompleteTextView username;
     private EditText mPasswordView;
+    private String login_name;
+    private String password;
     private View mProgressView;
     private View mLoginFormView;
     private TextView mResultTextView;
+    private SpringingImageView headshot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +100,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         //login
         //connect();
         mResultTextView = (TextView)findViewById(R.id.mResultTextView);
+        headshot = ((SpringingImageView) findViewById(R.id.headshot)).setIsCircleImage(true);
+        headshot.getSpringingHandlerController().addSpringingHandler(new SpringingTouchScaleHandler(this, headshot));
+
 
         CookieSyncManager.createInstance(this);
 
@@ -117,7 +125,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
 
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        username = (AutoCompleteTextView) findViewById(R.id.username);
         populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.password);
@@ -136,6 +144,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                new SpringingNotificationRotateHandler(LoginActivity.this, headshot).start(1);
                 attemptLogin();
             }
         });
@@ -144,12 +153,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         tempt.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent  = new Intent();
-                intent.setClass(LoginActivity.this,Project.class);
-                startActivity(intent);
+                new SpringingNotificationRotateHandler(LoginActivity.this, headshot).start(1);
             }
         });
-
+        new SpringingNotificationRotateHandler(this, headshot).start(1);
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
@@ -176,7 +183,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             return true;
         }
         if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(username, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
                     .setAction(android.R.string.ok, new View.OnClickListener() {
                         @Override
                         @TargetApi(Build.VERSION_CODES.M)
@@ -212,12 +219,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private void attemptLogin() {
 
         // Reset errors.
-        mEmailView.setError(null);
+        username.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        login_name = username.getText().toString();
+        password = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -227,22 +234,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 new Runnable() {
                     public void run() {
                         // On complete call either onLoginSuccess or onLoginFailed
-                        if(connectState == true)
+                        if(connectState)
                             onLoginSuccess();
-                        else
+                        else {
+                            new SpringingNotificationRotateHandler(LoginActivity.this, headshot).start(1);
                             onLoginFailed();
-                        //progressDialog.dismiss();
+                            //progressDialog.dismiss();
+                        }
                     }
                 }, 3000);
     }
 
     public void onLoginSuccess() {
         //_loginButton.setEnabled(true);
-        HeartConnect thread = new HeartConnect();
+        //HeartConnect thread = new HeartConnect();
         // thread.run();
         Intent serviceIntent;
         serviceIntent = new Intent(this, MyService.class);
         startService(serviceIntent);
+        Project.username = login_name;
         Intent intent = new Intent(LoginActivity.this, Project.class);
         startActivity(intent);
 
@@ -250,7 +260,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     public void onLoginFailed(){
-        Toast.makeText(LoginActivity.this,"Failed to login",Toast.LENGTH_LONG);
+        Toast.makeText(LoginActivity.this,"Failed to login",Toast.LENGTH_LONG).show();
+
     }
 
     private boolean isEmailValid(String email) {
@@ -339,7 +350,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 new ArrayAdapter<>(LoginActivity.this,
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
-        mEmailView.setAdapter(adapter);
+        username.setAdapter(adapter);
     }
 
 
@@ -376,7 +387,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         public void run() {
             // TODO
 
-            AXWEBSID = LoginProcess.logon(connectURL,user,password);
+            AXWEBSID = LoginProcess.logon(connectURL,login_name,password);
             Message msg = new Message();
             Bundle data = new Bundle();
             data.putString("value", AXWEBSID);

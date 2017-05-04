@@ -59,4 +59,9 @@
     <item>@string/preferences_front_light_auto</item>
     <item>@string/preferences_front_light_off</item>
   </string-array>
+  <string-array name="tab_titles">
+    <item>@string/list</item>
+    <item>@string/map</item>
+    <item>@string/history</item>
+  </string-array>
 </resources>

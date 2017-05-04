@@ -153,4 +153,9 @@
     <string name="instruction_1"> Input </string>
     <string name="instruction_2"> Scan </string>
 
+    <!--Strings related to tabs-->
+    <string name="list"> List </string>
+    <string name="map"> Map </string>
+    <string name="history"> History </string>
+
 </resources>

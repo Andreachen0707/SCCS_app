@@ -6,8 +6,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,11 +29,14 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.dell.sccs_app.Bean.DeviceListBean;
 import com.example.dell.sccs_app.Bean.ElectricListBean;
 import com.example.dell.sccs_app.Bean.ProjectBean;
 import com.example.dell.sccs_app.Util.DensityUtil;
+import com.example.dell.sccs_app.Widgets.Fragments;
+import com.example.dell.sccs_app.Widgets.ViewPagerAdapter;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -83,6 +92,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
+import static android.support.design.widget.TabLayout.MODE_SCROLLABLE;
 import static com.example.dell.sccs_app.StaticValue.ElectricListData;
 import static com.example.dell.sccs_app.StaticValue.addlamp;
 import static com.example.dell.sccs_app.StaticValue.addlamp2;
@@ -101,7 +111,7 @@ import static com.example.dell.sccs_app.StaticValue.stationquery_all;
 
 
 public class Project extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback {
+        implements ViewPager.OnPageChangeListener,OnMapReadyCallback {
 
     private GoogleMap mMap;
 
@@ -129,12 +139,29 @@ public class Project extends AppCompatActivity
     private Timer _axTimer = new Timer();
     private int mapIndex = 0;
 
+    public static String username;
+    private TextView show_name;
+    private Toolbar mToolbar;
+    private TabLayout mTabLayout;
+    private DrawerLayout mDrawerLayout;
+    private CoordinatorLayout mCoordinatorLayout;
+    private NavigationView mNavigationView;
+    private com.getbase.floatingactionbutton.FloatingActionButton mAddaction;
+    private ViewPager mViewPager;
+    private ViewPagerAdapter mViewPagerAdapter;
+    private List<Fragment> mFragments;
+    private AppBarLayout  mAppBarLayout;
+    private String[] mTitles;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+        initViews();
+        initSet();
+        configview();
 
 
         connectToServer("121.40.34.92","7070","1");
@@ -150,7 +177,7 @@ public class Project extends AppCompatActivity
         /*SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(Project.this);*/
 
-        Button scan = (Button)findViewById(R.id.scan);
+       /* Button scan = (Button)findViewById(R.id.scan);
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,20 +223,20 @@ public class Project extends AppCompatActivity
             }
         });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+               Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();*/
                 /*Intent scan = new Intent(Project.this,Scan.class);
-                startActivity(scan);*/
+                startActivity(scan);
                 Add_show();
             }
-        });
+        });*/
 
-        com.getbase.floatingactionbutton.FloatingActionButton addaction = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.addItemLamp);
-        addaction.setOnClickListener(new View.OnClickListener(){
+
+        mAddaction.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
                 Add_show();
@@ -217,15 +244,6 @@ public class Project extends AppCompatActivity
         });
 
 
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
     }
 
     private void Add_show(){
@@ -276,29 +294,102 @@ public class Project extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
+    @Override public void onPageSelected(int position) {
+        mToolbar.setTitle(mTitles[position]);
+    }
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+    }
 
-        } else if (id == R.id.nav_manage) {
-            connectType = 7;
-            MyThread2 m4 = new MyThread2();
-            m4.setName(connectType);
-            new Thread(m4).start();
-            Intent intent= new Intent();
-            intent.setClass(Project.this,LoginActivity.class);
-            startActivity(intent);
+    @Override public void onPageScrollStateChanged(int state) {
+
+    }
+
+    private void initViews() {
+        mAddaction = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.addItemLamp);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.content_main);
+        mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mTabLayout = (TabLayout) findViewById(R.id.id_tablayout);
+        mViewPager = (ViewPager) findViewById(R.id.id_viewpager);
+        //mFloatingActionButton = (FloatingActionButton) findViewById(R.id.id_floatingactionbutton);
+        mNavigationView =  (NavigationView) findViewById(R.id.nav_view);;
+    }
+
+    private void initSet() {
+
+        // Tab的标题采用string-array的方法保存，在res/values/arrays.xml中写
+        mTitles = getResources().getStringArray(R.array.tab_titles);
+
+        //初始化填充到ViewPager中的Fragment集合
+        mFragments = new ArrayList<>();
+        for (int i = 0; i < mTitles.length; i++) {
+            Bundle mBundle = new Bundle();
+            mBundle.putInt("flag", i);
+            Fragments mFragment = new Fragments();
+            mFragment.setArguments(mBundle);
+            mFragments.add(i, mFragment);
         }
+    }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+    private void configview(){
+        setSupportActionBar(mToolbar);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+
+        //mNavigationView.inflateHeaderView(R.layout.nav_header_project);
+        //mNavigationView.inflateMenu(R.menu.activity_project_drawer);
+        //show_name = (TextView)findViewById(R.id.username);
+        //show_name.setText(username);
+        onNavgationViewMenuItemSelected(mNavigationView);
+
+        mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), mTitles, mFragments);
+        mViewPager.setAdapter(mViewPagerAdapter);
+        // 设置ViewPager最大缓存的页面个数
+        mViewPager.setOffscreenPageLimit(3);
+        // 给ViewPager添加页面动态监听器（为了让Toolbar中的Title可以变化相应的Tab的标题）
+        mViewPager.addOnPageChangeListener(this);
+
+        mTabLayout.setTabMode(MODE_SCROLLABLE);
+        // 将TabLayout和ViewPager进行关联，让两者联动起来
+        mTabLayout.setupWithViewPager(mViewPager);
+        // 设置Tablayout的Tab显示ViewPager的适配器中的getPageTitle函数获取到的标题
+        mTabLayout.setTabsFromPagerAdapter(mViewPagerAdapter);
+    }
+
+
+    private void onNavgationViewMenuItemSelected(NavigationView mNav) {
+        mNav.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @SuppressWarnings("StatementWithEmptyBody")
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                // Handle navigation view item clicks here.
+                int id = item.getItemId();
+
+                if (id == R.id.nav_camera) {
+                    // Handle the camera action
+                } else if (id == R.id.nav_gallery) {
+
+                } else if (id == R.id.nav_manage) {
+                    connectType = 7;
+                    MyThread2 m4 = new MyThread2();
+                    m4.setName(connectType);
+                    new Thread(m4).start();
+                    Intent intent = new Intent();
+                    intent.setClass(Project.this, LoginActivity.class);
+                    startActivity(intent);
+                }
+
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
     }
 
 

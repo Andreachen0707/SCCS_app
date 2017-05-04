@@ -20,16 +20,16 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:gravity="center"
-            app:fab_icon="@drawable/ic_icon_input"
+            app:fab_icon="@drawable/ic_icon_input_gray"
             app:fab_size="normal"
-            app:fab_colorNormal="@color/button_input"/>
+            app:fab_colorNormal="@color/light_2"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
             android:text="@string/instruction_1"
-            android:textColor="@color/instruction"/>
+            android:textColor="@color/instruction_light"/>
     </LinearLayout>
 
     <LinearLayout
@@ -45,16 +45,16 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:gravity="center"
-            app:fab_icon="@drawable/ic_icon_scan"
+            app:fab_icon="@drawable/ic_icon_scan_gray"
             app:fab_size="normal"
-            app:fab_colorNormal="@color/button_scan"/>
+            app:fab_colorNormal="@color/light_2"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
             android:text="@string/instruction_2"
-            android:textColor="@color/instruction"
+            android:textColor="@color/instruction_light"
             />
     </LinearLayout>
 
