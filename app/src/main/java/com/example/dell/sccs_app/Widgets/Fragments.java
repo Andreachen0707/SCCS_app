@@ -1,9 +1,11 @@
 package com.example.dell.sccs_app.Widgets;
 
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,13 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.dell.sccs_app.FragmentDesign.MapFragment;
 import com.example.dell.sccs_app.R;
 
 /**
  * Created by dell on 2017/5/4.
  */
 
-public class Fragments extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class Fragments extends Fragment implements SwipeRefreshLayout.OnRefreshListener,RecyclerViewAdapter.OnItemClickListener {
     private static final int List = 0;
     private static final int Map = 1;
     private static final int History = 2;
@@ -28,6 +31,9 @@ public class Fragments extends Fragment implements SwipeRefreshLayout.OnRefreshL
     private View mView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerViewAdapter mRecyclerViewAdaptor;
+
 
     @Nullable
     @Override
@@ -53,10 +59,12 @@ public class Fragments extends Fragment implements SwipeRefreshLayout.OnRefreshL
     private void configRecyclerView(){
         switch (flag){
             case Map:
-                Log.i("Map test","in");
+
                 break;
             case List:
                 Log.i("List test","in");
+                //mLayoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+
                 break;
             case History:
                 Log.i("History test","in");
@@ -64,12 +72,25 @@ public class Fragments extends Fragment implements SwipeRefreshLayout.OnRefreshL
             default:
                 break;
         }
+        //mRecyclerViewAdaptor = new RecyclerViewAdapter(getActivity());
+        //mRecyclerViewAdaptor.setOnItemClickListener(this);
+        //mRecyclerView.setAdapter(mRecyclerViewAdaptor);
+        //mRecyclerView.setLayoutManager(mLayoutManager);
+
     }
 
     @Override
     public void onRefresh(){
         Log.i("Refresh test","in");
     }
+    @Override
+    public void onItemClick(View view, int position) {
+        Snackbar.make(mRecyclerView, getString(R.string.list), 0);
+    }
 
+    @Override
+    public void onItemLongClick(View view, int position) {
+        Snackbar.make(mRecyclerView, getString(R.string.map), 0);
+    }
 
 }

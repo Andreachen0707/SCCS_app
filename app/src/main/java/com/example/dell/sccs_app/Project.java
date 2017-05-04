@@ -34,6 +34,7 @@ import android.widget.TextView;
 import com.example.dell.sccs_app.Bean.DeviceListBean;
 import com.example.dell.sccs_app.Bean.ElectricListBean;
 import com.example.dell.sccs_app.Bean.ProjectBean;
+import com.example.dell.sccs_app.FragmentDesign.MapFragment;
 import com.example.dell.sccs_app.Util.DensityUtil;
 import com.example.dell.sccs_app.Widgets.Fragments;
 import com.example.dell.sccs_app.Widgets.ViewPagerAdapter;
@@ -332,13 +333,39 @@ public class Project extends AppCompatActivity
             mFragment.setArguments(mBundle);
             mFragments.add(i, mFragment);
         }
+        Fragment testFragment = new Fragment();
+        testFragment = getItem(0);
+        mFragments.set(2,testFragment);
+    }
+    public Fragment getItem(int arg0) {
+        Fragment ft = null;
+        switch (arg0) {
+            case 0:
+                ft = new MapFragment();
+                break;
+
+            default:
+                ft = new MapFragment();
+
+                Bundle args = new Bundle();
+                args.putString("page","1");
+                ft.setArguments(args);
+
+                break;
+        }
+        return ft;
     }
 
     private void configview(){
         setSupportActionBar(mToolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+            public void onDrawerOpened(View drawerView) {
+                show_name = (TextView)findViewById(R.id.username);
+                show_name.setText(username);
+            }
+        };
         mDrawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -351,11 +378,12 @@ public class Project extends AppCompatActivity
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), mTitles, mFragments);
         mViewPager.setAdapter(mViewPagerAdapter);
         // 设置ViewPager最大缓存的页面个数
-        mViewPager.setOffscreenPageLimit(3);
+        mViewPager.setOffscreenPageLimit(5);
         // 给ViewPager添加页面动态监听器（为了让Toolbar中的Title可以变化相应的Tab的标题）
         mViewPager.addOnPageChangeListener(this);
 
         mTabLayout.setTabMode(MODE_SCROLLABLE);
+        mTabLayout.setTabMode(TabLayout.MODE_FIXED);
         // 将TabLayout和ViewPager进行关联，让两者联动起来
         mTabLayout.setupWithViewPager(mViewPager);
         // 设置Tablayout的Tab显示ViewPager的适配器中的getPageTitle函数获取到的标题

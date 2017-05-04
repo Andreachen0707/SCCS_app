@@ -86,7 +86,7 @@
                 android:id = "@+id/headshot"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:src = "@drawable/headshot"
+                android:src = "@drawable/icons"
                 android:layout_marginBottom="40dp"/>
 
             <android.support.design.widget.TextInputLayout
