@@ -158,4 +158,8 @@
     <string name="map"> Map </string>
     <string name="history"> History </string>
 
+    <!--Strings related to label-->
+    <string name="controller">Controller</string>
+    <string name="lamp">Lamp</string>
+
 </resources>

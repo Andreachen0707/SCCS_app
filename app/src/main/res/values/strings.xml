@@ -54,4 +54,8 @@
     <string name="map"> 地图 </string>
     <string name="history"> 历史 </string>
 
+    <!--Strings related to label-->
+    <string name="controller">控制器</string>
+    <string name="lamp">灯具</string>
+    <string name="title_activity_maps_test">Map</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.example.dell.sccs_app.Widgets;
 
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -82,6 +83,20 @@ public class Fragments extends Fragment implements SwipeRefreshLayout.OnRefreshL
     @Override
     public void onRefresh(){
         Log.i("Refresh test","in");
+       /* new Handler().postDelayed(new Runnable() {
+            @Override public void run() {
+                mSwipeRefreshLayout.setRefreshing(false);
+                int temp = (int) (Math.random() * 10);
+                if (flag != STAGGERED_GRID) {
+                    mRecyclerViewAdapter.mDatas.add(0, "new" + temp);
+                    mRecyclerViewAdapter.notifyDataSetChanged();
+                } else {
+                    mStaggeredAdapter.mDatas.add(0, "new" + temp);
+                    mStaggeredAdapter.mHeights.add(0, (int) (Math.random() * 300) + 200);
+                    mStaggeredAdapter.notifyDataSetChanged();
+                }
+            }
+        }, 1000);*/
     }
     @Override
     public void onItemClick(View view, int position) {

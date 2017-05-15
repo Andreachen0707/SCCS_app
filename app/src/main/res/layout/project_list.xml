@@ -1,11 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1"
+    android:fitsSystemWindows="true"
+    tools:context="com.example.dell.sccs_app.FragmentDesign.MapFragment">
+
     <TextView
-        android:id="@+id/tv_tabName"
-        android:layout_width="wrap_content"
+        android:id="@+id/tempProject"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swiperefreshlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+        <ListView
+            android:id="@+id/project_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity = "start|top">
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/addItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+
+        android:layout_margin="@dimen/fab_margin"
+
+        app:fab_addButtonColorNormal="@color/instruction_light"
+        app:fab_addButtonColorPressed="@android:color/darker_gray"
+        app:fab_addButtonPlusIconColor="@color/instruction"
+        app:fab_addButtonSize="mini"
+        app:fab_labelStyle="@style/menu_labels_style"
+        app:fab_labelsPosition="right"
+        app:fab_expandDirection="up"
+        tools:ignore="RtlHardcoded">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addItemLamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            app:fab_size="mini"
+            app:fab_title="@string/controller"
+            app:fab_icon="@drawable/ic_icon_controler_gray"
+            app:fab_colorNormal="@android:color/white"
+            app:fab_colorPressed="@android:color/darker_gray"/>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addItemControl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_icon="@drawable/ic_icon_scan_gray"
+            app:fab_colorNormal="@android:color/white"
+            app:fab_colorPressed="@android:color/darker_gray"
+            app:fab_size="mini"
+            app:fab_title="@string/lamp"/>
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+    </LinearLayout>
+
 
 </LinearLayout>

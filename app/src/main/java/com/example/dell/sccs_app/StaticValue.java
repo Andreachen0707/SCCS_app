@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 public class StaticValue {
     public static boolean connectState = false;
+    public static boolean project_get = false;
     public static String set_port = "121.40.34.92:7070";
     public static String basicURL = "http://"+set_port;
     public static String connectURL = basicURL+"/api/json?cmd=login&ctrl=user&version=1&lang=zh_CN";
@@ -31,4 +32,5 @@ public class StaticValue {
     public static ArrayList<DeviceListBean> deviceListData = new ArrayList<>();
     public static ArrayList<ElectricListBean> ElectricListData = new ArrayList<>();
     public static int projectTemp = 0;
+    public static int addaction = 0;
 }

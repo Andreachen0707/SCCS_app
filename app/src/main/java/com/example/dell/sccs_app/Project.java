@@ -35,6 +35,7 @@ import com.example.dell.sccs_app.Bean.DeviceListBean;
 import com.example.dell.sccs_app.Bean.ElectricListBean;
 import com.example.dell.sccs_app.Bean.ProjectBean;
 import com.example.dell.sccs_app.FragmentDesign.MapFragment;
+import com.example.dell.sccs_app.FragmentDesign.ProjectFragment;
 import com.example.dell.sccs_app.Util.DensityUtil;
 import com.example.dell.sccs_app.Widgets.Fragments;
 import com.example.dell.sccs_app.Widgets.ViewPagerAdapter;
@@ -95,8 +96,6 @@ import java.util.TimerTask;
 
 import static android.support.design.widget.TabLayout.MODE_SCROLLABLE;
 import static com.example.dell.sccs_app.StaticValue.ElectricListData;
-import static com.example.dell.sccs_app.StaticValue.addlamp;
-import static com.example.dell.sccs_app.StaticValue.addlamp2;
 import static com.example.dell.sccs_app.StaticValue.askConcentratorUrl;
 import static com.example.dell.sccs_app.StaticValue.askElectricUrl;
 import static com.example.dell.sccs_app.StaticValue.askProjectListUrl;
@@ -105,6 +104,7 @@ import static com.example.dell.sccs_app.StaticValue.deviceListData;
 import static com.example.dell.sccs_app.StaticValue.logout;
 import static com.example.dell.sccs_app.StaticValue.projectData;
 import static com.example.dell.sccs_app.StaticValue.projectTemp;
+import static com.example.dell.sccs_app.StaticValue.project_get;
 import static com.example.dell.sccs_app.StaticValue.sendUrl;
 import static com.example.dell.sccs_app.StaticValue.sid;
 import static com.example.dell.sccs_app.StaticValue.stationquery;
@@ -147,12 +147,16 @@ public class Project extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     private CoordinatorLayout mCoordinatorLayout;
     private NavigationView mNavigationView;
-    private com.getbase.floatingactionbutton.FloatingActionButton mAddaction;
+
     private ViewPager mViewPager;
     private ViewPagerAdapter mViewPagerAdapter;
     private List<Fragment> mFragments;
     private AppBarLayout  mAppBarLayout;
     private String[] mTitles;
+
+    private Fragment Fragment_Map;
+    private Fragment Fragment_Project;
+    private Fragment Fragment_History;
 
 
     @Override
@@ -160,20 +164,12 @@ public class Project extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project);
 
+        connectToServer("121.40.34.92","7070","1");
+
+
         initViews();
         initSet();
         configview();
-
-
-        connectToServer("121.40.34.92","7070","1");
-        new Thread(networkTask).start();
-
-        connectType = 1;
-        MyThread2 m1 = new MyThread2();
-        m1.setName(connectType);
-        new Thread(m1).start();
-
-
 
         /*SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(Project.this);*/
@@ -237,21 +233,12 @@ public class Project extends AppCompatActivity
         });*/
 
 
-        mAddaction.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Add_show();
-            }
-        });
+
 
 
     }
 
-    private void Add_show(){
-        Intent intent = new Intent();
-        intent.setClass(this,Add_lamp.class);
-        startActivity(intent);
-    }
+
 
     @Override
     public void onBackPressed() {
@@ -308,7 +295,6 @@ public class Project extends AppCompatActivity
     }
 
     private void initViews() {
-        mAddaction = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.addItemLamp);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.content_main);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
@@ -316,7 +302,9 @@ public class Project extends AppCompatActivity
         mTabLayout = (TabLayout) findViewById(R.id.id_tablayout);
         mViewPager = (ViewPager) findViewById(R.id.id_viewpager);
         //mFloatingActionButton = (FloatingActionButton) findViewById(R.id.id_floatingactionbutton);
-        mNavigationView =  (NavigationView) findViewById(R.id.nav_view);;
+        mNavigationView =  (NavigationView) findViewById(R.id.nav_view);
+        connectType = 1;
+        new Thread(networkTask).start();
     }
 
     private void initSet() {
@@ -326,16 +314,25 @@ public class Project extends AppCompatActivity
 
         //初始化填充到ViewPager中的Fragment集合
         mFragments = new ArrayList<>();
-        for (int i = 0; i < mTitles.length; i++) {
+        Fragment_Project = new ProjectFragment();
+        /*Bundle mBundle = new Bundle();
+        mBundle.putInt("flag",0);
+        Fragment_Project = new Fragments();
+        Fragment_Project.setArguments(mBundle);
+        */
+        Fragment_Map = new MapFragment();
+
+        mFragments.add(0,Fragment_Project);
+        mFragments.add(1,Fragment_Map);
+        /*for (int i = 0; i < mTitles.length; i++) {
             Bundle mBundle = new Bundle();
             mBundle.putInt("flag", i);
             Fragments mFragment = new Fragments();
             mFragment.setArguments(mBundle);
             mFragments.add(i, mFragment);
-        }
-        Fragment testFragment = new Fragment();
-        testFragment = getItem(0);
-        mFragments.set(2,testFragment);
+        }*/
+        //Fragment_History =getItem(0);
+        //mFragments.add(2,Fragment_History);
     }
     public Fragment getItem(int arg0) {
         Fragment ft = null;
@@ -378,7 +375,8 @@ public class Project extends AppCompatActivity
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), mTitles, mFragments);
         mViewPager.setAdapter(mViewPagerAdapter);
         // 设置ViewPager最大缓存的页面个数
-        mViewPager.setOffscreenPageLimit(5);
+        mViewPager.setOffscreenPageLimit(0);
+        mViewPager.setCurrentItem(1);
         // 给ViewPager添加页面动态监听器（为了让Toolbar中的Title可以变化相应的Tab的标题）
         mViewPager.addOnPageChangeListener(this);
 
@@ -710,6 +708,7 @@ public class Project extends AppCompatActivity
                 Log.i("projectname",i+projectData.get(i).getName());
                 i++;
             }
+            project_get = true;
             //Log.i("projectdata",projectData.get(0).getId());
         }
         else if(type == 2 ||type == 5) {
