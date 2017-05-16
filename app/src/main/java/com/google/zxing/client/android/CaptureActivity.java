@@ -764,7 +764,7 @@ public final class CaptureActivity extends AppCompatActivity implements SurfaceH
     //  Bundle bundle= new Bundle();
     //  bundle.putString("scan_result",rawResult.getText());
       intent.putExtra("scan_result",rawResult.getText());
-      setResult(0x345,intent);
+      startActivity(intent);
       finish();
 
     }

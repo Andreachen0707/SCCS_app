@@ -38,6 +38,7 @@ import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.utils.CoordinateConverter;
 import com.example.dell.sccs_app.Add_lamp;
 import com.example.dell.sccs_app.Project;
 import com.example.dell.sccs_app.R;
@@ -83,7 +84,7 @@ public class MapFragment extends Fragment {
 
         initMap();
         initLocation();
-        currentLocation();
+        //currentLocation();
         Handler info = new Handler();
 
 
@@ -165,97 +166,7 @@ public class MapFragment extends Fragment {
         option.setScanSpan(1000);//1000毫秒定位一次
         option.setIsNeedLocationPoiList(true);//可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
         mLocationClient.setLocOption(option);
-    }
-
-    private void currentLocation(){
-        //String bestProvider = locationManager.getBestProvider(getCriteria(), true);
-        //Location location = locationManager.getLastKnownLocation(bestProvider);
-        if(ContextCompat.checkSelfPermission(getActivity(),android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED) {
-            locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
-            List<String> list = locationManager.getProviders(true);
-            if (list.contains(LocationManager.GPS_PROVIDER)) {
-                //是否为GPS位置控制器
-                provider = LocationManager.GPS_PROVIDER;
-            } else if (list.contains(LocationManager.NETWORK_PROVIDER)) {
-                //是否为网络位置控制器
-                provider = LocationManager.NETWORK_PROVIDER;
-
-            } else {
-                Toast.makeText(getActivity(), "请检查网络或GPS是否打开",
-                        Toast.LENGTH_LONG).show();
-                return;
-            }
-            Location location = locationManager.getLastKnownLocation(provider);
-            //updateView(location);
-            if (location != null) {
-                //获取当前位置，这里只用到了经纬度
-                //longitude = location.getLatitude();
-                //latitude = location.getLongitude();
-                navigateTo(location);
-            }
-
-            locationManager.requestLocationUpdates(provider, 2000, 1, new LocationListener() {
-
-                @Override
-                public void onProviderEnabled(String provider) {
-                    //updateView(locationManager.getLastKnownLocation(provider));
-                }
-
-                @Override
-                public void onProviderDisabled(String provider) {
-                }
-
-                @Override
-                public void onLocationChanged(Location location) {
-                    //updateView(location);
-                    navigateTo(location);
-                }
-
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-                }
-            });
-        }
-    }
-
-    private void navigateTo(Location location) {
-        // 按照经纬度确定地图位置
-        if (ifFrist) {
-            LatLng ll = new LatLng(location.getLatitude(),
-                    location.getLongitude());
-            MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
-            // 移动到某经纬度
-            mBaidumap.animateMapStatus(update);
-            update = MapStatusUpdateFactory.zoomBy(5f);
-            // 放大
-            mBaidumap.animateMapStatus(update);
-
-            ifFrist = false;
-        }
-        // 显示个人位置图标
-        MyLocationData.Builder builder = new MyLocationData.Builder();
-        builder.latitude(location.getLatitude());
-        builder.longitude(location.getLongitude());
-        MyLocationData data = builder.build();
-        mBaidumap.setMyLocationData(data);
-    }
-
-
-    private Criteria getCriteria(){
-        Criteria criteria=new Criteria();
-        //设置定位精确度 Criteria.ACCURACY_COARSE比较粗略，Criteria.ACCURACY_FINE则比较精细
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        //设置是否要求速度
-        criteria.setSpeedRequired(false);
-        // 设置是否允许运营商收费
-        criteria.setCostAllowed(false);
-        //设置是否需要方位信息
-        criteria.setBearingRequired(false);
-        //设置是否需要海拔信息
-        criteria.setAltitudeRequired(false);
-        // 设置对电源的需求
-        criteria.setPowerRequirement(Criteria.POWER_HIGH);
-        return criteria;
+        mLocationClient.start();
     }
 
     public static double convertToDouble(String number, double defaultValue) {

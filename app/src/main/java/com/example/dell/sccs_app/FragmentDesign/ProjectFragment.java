@@ -77,9 +77,17 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     private void initData() {
-        for(int i=0;i<projectData.size();i++) {
-            project_name.add(projectData.get(i).getName());
+        if(project_name.size()==0) {
+            for (int i = 0; i < projectData.size(); i++) {
+                project_name.add(i,projectData.get(i).getName());
+            }
         }
+        else {
+            for (int i = 0; i < projectData.size(); i++) {
+                project_name.set(i,projectData.get(i).getName());
+            }
+        }
+
     }
 
     private void initView(){
@@ -119,6 +127,7 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
         initData();
         if(project_get) {
             if (projectTemp >= 0) {
+                project_list.setAdapter(mAdapter);
                 project_list.setItemChecked(projectTemp, true);
                 tempProject.setText("当前项目组 | " + project_name.get(projectTemp));
             }
