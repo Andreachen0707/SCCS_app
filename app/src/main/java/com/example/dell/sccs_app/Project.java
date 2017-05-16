@@ -96,11 +96,16 @@ import java.util.TimerTask;
 
 import static android.support.design.widget.TabLayout.MODE_SCROLLABLE;
 import static com.example.dell.sccs_app.StaticValue.ElectricListData;
+import static com.example.dell.sccs_app.StaticValue.addContrallor;
+import static com.example.dell.sccs_app.StaticValue.addLamp;
 import static com.example.dell.sccs_app.StaticValue.askConcentratorUrl;
 import static com.example.dell.sccs_app.StaticValue.askElectricUrl;
+import static com.example.dell.sccs_app.StaticValue.askLampUrl;
 import static com.example.dell.sccs_app.StaticValue.askProjectListUrl;
 import static com.example.dell.sccs_app.StaticValue.askStationListUrl;
 import static com.example.dell.sccs_app.StaticValue.deviceListData;
+import static com.example.dell.sccs_app.StaticValue.infostate_1;
+import static com.example.dell.sccs_app.StaticValue.infostate_2;
 import static com.example.dell.sccs_app.StaticValue.logout;
 import static com.example.dell.sccs_app.StaticValue.projectData;
 import static com.example.dell.sccs_app.StaticValue.projectTemp;
@@ -138,6 +143,9 @@ public class Project extends AppCompatActivity
     private HeadTask headTask = null;
     private WebClient mClient;
     private Timer _axTimer = new Timer();
+    private  MyThread2 m1 = new MyThread2();
+    private  MyThread2 m2 = new MyThread2();
+    private  MyThread2 m3 = new MyThread2();
     private int mapIndex = 0;
 
     public static String username;
@@ -304,6 +312,9 @@ public class Project extends AppCompatActivity
         //mFloatingActionButton = (FloatingActionButton) findViewById(R.id.id_floatingactionbutton);
         mNavigationView =  (NavigationView) findViewById(R.id.nav_view);
         connectType = 1;
+        m1.setName(2);
+        m2.setName(3);
+        m3.setName(4);
         new Thread(networkTask).start();
     }
 
@@ -334,24 +345,7 @@ public class Project extends AppCompatActivity
         //Fragment_History =getItem(0);
         //mFragments.add(2,Fragment_History);
     }
-    public Fragment getItem(int arg0) {
-        Fragment ft = null;
-        switch (arg0) {
-            case 0:
-                ft = new MapFragment();
-                break;
 
-            default:
-                ft = new MapFragment();
-
-                Bundle args = new Bundle();
-                args.putString("page","1");
-                ft.setArguments(args);
-
-                break;
-        }
-        return ft;
-    }
 
     private void configview(){
         setSupportActionBar(mToolbar);
@@ -402,7 +396,7 @@ public class Project extends AppCompatActivity
                 } else if (id == R.id.nav_gallery) {
 
                 } else if (id == R.id.nav_manage) {
-                    connectType = 7;
+                    connectType = 0;
                     MyThread2 m4 = new MyThread2();
                     m4.setName(connectType);
                     new Thread(m4).start();
@@ -417,7 +411,6 @@ public class Project extends AppCompatActivity
             }
         });
     }
-
 
     public class HeadTask extends AsyncTask<String, Void, Map>{
         private final String muser;
@@ -532,9 +525,21 @@ public class Project extends AppCompatActivity
         }
     }
 
-
-
-
+    Runnable networkTask = new Runnable() {
+        @Override
+        public void run() {
+            int type = connectType;
+            String res = getProjectName(type);
+            Message msg = new Message();
+            Bundle data = new Bundle();
+            data.putString("value", res);
+            data.putString("type", String.valueOf(type));
+            msg.setData(data);
+            handler.sendMessage(msg);
+            if(connectType!=1)
+                connectType++;
+        }
+    };
 
     Handler handler = new Handler() {
         @Override
@@ -546,8 +551,8 @@ public class Project extends AppCompatActivity
             Log.i("mylog", "请求结果为-->" + val);
             // TODO
             // UI界面的更新等相关操作
-                Log.i("fuck",type);
-            if("".equals(val))
+            Log.i("fuck",type);
+            if(type.equals(0))
                 Log.i("Log out","true");
 
             else {
@@ -567,37 +572,18 @@ public class Project extends AppCompatActivity
                     jsonTranslate(val, Integer.parseInt(type));
                 }
             }
-
-
         }
     };
 
-    Runnable networkTask = new Runnable() {
-        @Override
-        public void run() {
-            int type = connectType;
-            String res = getProjectName(type);
-            Message msg = new Message();
-            Bundle data = new Bundle();
-            data.putString("value", res);
-            data.putString("type", String.valueOf(type));
-            msg.setData(data);
-            handler.sendMessage(msg);
-            if(connectType!=1)
-                connectType++;
-        }
-    };
-    public class MyThread2 implements Runnable
+    private class MyThread2 implements Runnable
     {
         private int type;
-
         public void setName(int name)
         {
             this.type = name;
         }
         public void run()
         {
-
             String res = getProjectName(type);
             Message msg = new Message();
             Bundle data = new Bundle();
@@ -607,6 +593,7 @@ public class Project extends AppCompatActivity
             handler.sendMessage(msg);
         }
     }
+
 
     @SuppressWarnings({ "deprecation", "resource" })
     public String getProjectName(int con_type) {
@@ -628,27 +615,32 @@ public class Project extends AppCompatActivity
             case 3://电表型号接口
                 link = askElectricUrl;
                 projectId = projectData.get(projectTemp).getId();
-                //String electid = ElectricListData.get(1).getModelId();
-                //Log.i("elecid",electid);
-                //body = "{\"page\":1,\"pageSize\":50,\"wheres\":[{\"k\":\"projectId\",\"o\":\"=\",\"v\":\""+projectId+"\"}],\"orders\":[{\"k\":\"model\",\"v\":\"ASC\"}]}";
                 body = "{\"wheres\":[{\"k\":\"asDefault\",\"o\":\"=\",\"v\":true},{\"k\":\"projectId\",\"o\":\"=\",\"v\":\""+projectId+"\"}],\"orders\":[]}";
                 break;
-            case 4:
-                link = sendUrl;
+
+            case 4://lamp interface
+                link = askLampUrl;
+                projectId = projectData.get(projectTemp).getId();
+                body = "{\"page\":1,\"pageSize\":50,\"wheres\":[{\"k\":\"projectId\",\"o\":\"=\",\"v\":\""+projectId+"\"}],\"orders\":[{\"k\":\"model\",\"v\":\"ASC\"}]}";
+                Log.i("body" ,body);
+                break;
+
+            case 5://add controller
+                link = addContrallor;
                 projectId = projectData.get(projectTemp).getId();
                 body = "{\"pid\":\""+projectId+"\",\"name\":\""+name+"\",\"cuid\":\""+cuid+"\",\"ctype\":1,\"cmodel\":\""+deviceListData.get(1).getModelId()+"\",\"devices\":[{\"deviceType\":2,\"modelId\":\""+ElectricListData.get(0).getModelId()+"\",\"name\":\"Built-in METER\"}],\"lat\":"+lat+",\"lng\":"+lng+"}";
                 Log.i("body" ,body);
                 break;
-            case 5:
-                link = stationquery_all;
+            case 6:
+                link = addLamp;
                 projectId = projectData.get(0).getId();
                 body =  " {\"pid\":\""+projectId+"\"}";
                 break;
-            case 6:
+            case 7:
                 link = stationquery;
                 body = "{\"wheres\":[{\"k\":\"stationId\",\"o\":\"=\",\"v\":\"a5cff7fddf19414289ea8d6959e1021b\"}],\"orders\":[]}";
                 break;
-            case 7:
+            case 0:
                 link = logout;
                 break;
             default:
@@ -709,9 +701,11 @@ public class Project extends AppCompatActivity
                 i++;
             }
             project_get = true;
-            //Log.i("projectdata",projectData.get(0).getId());
+            new Thread(m1).start();
+            new Thread(m2).start();
+            new Thread(m3).start();
         }
-        else if(type == 2 ||type == 5) {
+        else if(type == 2) {
             deviceListData.clear();
             int i = 0;
             for(JsonElement user : jsonArray) {
@@ -719,7 +713,8 @@ public class Project extends AppCompatActivity
                 deviceListData.add(i,device);
                 i++;
             }
-            Log.i("elecid",deviceListData.get(1).getModelId());
+            infostate_1 = true;
+            //Log.i("elecid",deviceListData.get(1).getModelId());
         } else if(type == 3) {
             ElectricListData.clear();
             int i = 0;
@@ -728,6 +723,7 @@ public class Project extends AppCompatActivity
                 ElectricListData.add(i,device);
                 i++;
             }
+            infostate_2 = true;
         }
         else if(type == 6){
             Log.i("im ","in");
@@ -736,12 +732,6 @@ public class Project extends AppCompatActivity
                 ElectricListBean device =  gson.fromJson(user,ElectricListBean.class);
                 ElectricListData.add(device);
             }
-        }
-    }
-
-    private void initData() {
-        for(int i=0;i<projectData.size();i++) {
-            project_name.add(projectData.get(i).getName());
         }
     }
 

@@ -16,6 +16,8 @@
 
 package com.google.zxing.client.android;
 
+import com.example.dell.sccs_app.Add_lamp;
+import com.example.dell.sccs_app.Commit;
 import com.example.dell.sccs_app.R;
 import com.example.dell.sccs_app.Scan;
 import com.example.dell.sccs_app.Setting;
@@ -152,7 +154,7 @@ public final class CaptureActivity extends AppCompatActivity implements SurfaceH
     toolbarsetting.setNavigationOnClickListener(new View.OnClickListener(){
       @Override
       public void onClick(View v){
-        Intent intent = new Intent(CaptureActivity.this,Scan.class);
+        Intent intent = new Intent(CaptureActivity.this,Add_lamp.class);
         startActivity(intent);
         Toast.makeText(CaptureActivity.this,"UP",Toast.LENGTH_SHORT).show();
       }
@@ -757,7 +759,7 @@ public final class CaptureActivity extends AppCompatActivity implements SurfaceH
       //Toast.makeText(CaptureActivity.this,rawResult.getText(),Toast.LENGTH_SHORT).show();
 
       Intent intent = new Intent();
-      intent.setClass(CaptureActivity.this,Scan.class);
+      intent.setClass(CaptureActivity.this,Commit.class);
 
     //  Bundle bundle= new Bundle();
     //  bundle.putString("scan_result",rawResult.getText());

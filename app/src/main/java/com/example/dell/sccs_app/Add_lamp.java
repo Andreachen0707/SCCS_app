@@ -72,7 +72,7 @@ public class Add_lamp extends AppCompatActivity {
             public void onClick(View v){
                 Intent intent = new Intent();
                 intent.setClass(Add_lamp.this, CaptureActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,0x123);
             }
         });
 

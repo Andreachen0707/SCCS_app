@@ -8,6 +8,15 @@
     android:layout_height="match_parent"
     tools:context="com.example.dell.sccs_app.MapsActivity" >
 
+
+
+    <com.baidu.mapapi.map.MapView
+        android:id="@+id/baidu_map"
+        android:layout_width = "fill_parent"
+        android:layout_height = "fill_parent"
+        android:clickable="true">
+    </com.baidu.mapapi.map.MapView>
+
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/addItem"
         android:layout_width="wrap_content"
@@ -46,15 +55,6 @@
             app:fab_size="mini"
             app:fab_title="@string/lamp"/>
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
-
-    <com.baidu.mapapi.map.MapView
-        android:id="@+id/baidu_map"
-        android:layout_width = "fill_parent"
-        android:layout_height = "fill_parent"
-        android:clickable="true">
-    </com.baidu.mapapi.map.MapView>
-
-
 
 
     </FrameLayout>

@@ -12,6 +12,8 @@ import java.util.ArrayList;
 
 public class StaticValue {
     public static boolean connectState = false;
+    public static boolean infostate_1 = false;
+    public static boolean infostate_2 = false;
     public static boolean project_get = false;
     public static String set_port = "121.40.34.92:7070";
     public static String basicURL = "http://"+set_port;
@@ -23,6 +25,11 @@ public class StaticValue {
     public static String askStationListUrl = "http://121.40.34.92:7070/api/json?cmd=station-info&ctrl=list&version=1&lang=zh_CN&sid=";
     public static String askConcentratorUrl = "http://121.40.34.92:7070/api/json?cmd=modelRtu&ctrl=page&version=1&lang=zh_CN&sid=";
     public static String askElectricUrl = "http://121.40.34.92:7070/api/json?cmd=modelMeter&ctrl=list&version=1&lang=zh_CN&sid=";
+    public static String askLampUrl = "http://121.40.34.92:7070/api/json?cmd=modellamp&ctrl=page&version=1&lang=zh_CN&sid=";
+
+    public static String addContrallor= "http://121.40.34.92:7070/api/json?cmd=stations&ctrl=add&version=1&lang=zh_CN&sid=";
+    public static String addLamp= "http://121.40.34.92:7070/api/json?cmd=lamps&ctrl=add&version=1&lang=zh_CN&sid=";
+
     public static String sendUrl = "http://121.40.34.92:7070/api/json?cmd=stations&ctrl=add&version=1&lang=zh_CN&sid=";
     public static String addlamp = "http://121.40.34.92:7070/api/json?cmd=lamp&ctrl=latlng&version=1&lang=zh_CN&sid=";
     public static String addlamp2 = "http://121.40.34.92:7070/api/json?cmd=lamps&ctrl=add&version=1&lang=zh_CN&sid=";

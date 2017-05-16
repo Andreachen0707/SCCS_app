@@ -1,13 +1,24 @@
 package com.example.dell.sccs_app.FragmentDesign;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -28,7 +39,10 @@ import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.example.dell.sccs_app.Add_lamp;
+import com.example.dell.sccs_app.Project;
 import com.example.dell.sccs_app.R;
+
+import java.util.List;
 
 import static com.example.dell.sccs_app.StaticValue.addaction;
 
@@ -46,6 +60,10 @@ public class MapFragment extends Fragment {
     private double longitude;
     private double latitude;
     private LocationClient mLocationClient;
+    private LocationManager locationManager;
+    private String provider;
+    private boolean ifFrist = true;
+
     private View mView;
     private boolean modeFlag = true;
     private float zoomLevel;
@@ -57,6 +75,7 @@ public class MapFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         SDKInitializer.initialize(getActivity().getApplicationContext());
 
+
         mView = inflater.inflate(R.layout.map_fragment, container, false);
 
         mAddaction = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemLamp);
@@ -64,10 +83,16 @@ public class MapFragment extends Fragment {
 
         initMap();
         initLocation();
+        currentLocation();
+        Handler info = new Handler();
+
+
         //初始化以后要获得一系列的参数 去获取集中器和灯的地理位置 然后标记在地图上
 
 
         //添加新集中器时标记的方式
+        latitude = 30.00;
+        longitude = 120.00;
         mapAnnotation();
 
         mAddaction.setOnClickListener(new View.OnClickListener(){
@@ -97,11 +122,12 @@ public class MapFragment extends Fragment {
         //获取地图控件引用
         mMapView = (MapView) mView.findViewById(R.id.baidu_map);
         // 不显示缩放比例尺
-        mMapView.showZoomControls(true);
+        mMapView.showZoomControls(false);
         // 不显示百度地图Logo
         mMapView.removeViewAt(1);
         //百度地图
         mBaidumap = mMapView.getMap();
+        mBaidumap.setMyLocationEnabled(true);
         // 改变地图状态
         MapStatus mMapStatus = new MapStatus.Builder().zoom(15).build();
         MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
@@ -141,6 +167,109 @@ public class MapFragment extends Fragment {
         mLocationClient.setLocOption(option);
     }
 
+    private void currentLocation(){
+        //String bestProvider = locationManager.getBestProvider(getCriteria(), true);
+        //Location location = locationManager.getLastKnownLocation(bestProvider);
+        if(ContextCompat.checkSelfPermission(getActivity(),android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED) {
+            locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
+            List<String> list = locationManager.getProviders(true);
+            if (list.contains(LocationManager.GPS_PROVIDER)) {
+                //是否为GPS位置控制器
+                provider = LocationManager.GPS_PROVIDER;
+            } else if (list.contains(LocationManager.NETWORK_PROVIDER)) {
+                //是否为网络位置控制器
+                provider = LocationManager.NETWORK_PROVIDER;
+
+            } else {
+                Toast.makeText(getActivity(), "请检查网络或GPS是否打开",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+            Location location = locationManager.getLastKnownLocation(provider);
+            //updateView(location);
+            if (location != null) {
+                //获取当前位置，这里只用到了经纬度
+                //longitude = location.getLatitude();
+                //latitude = location.getLongitude();
+                navigateTo(location);
+            }
+
+            locationManager.requestLocationUpdates(provider, 2000, 1, new LocationListener() {
+
+                @Override
+                public void onProviderEnabled(String provider) {
+                    //updateView(locationManager.getLastKnownLocation(provider));
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+                }
+
+                @Override
+                public void onLocationChanged(Location location) {
+                    //updateView(location);
+                    navigateTo(location);
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+                }
+            });
+        }
+    }
+
+    private void navigateTo(Location location) {
+        // 按照经纬度确定地图位置
+        if (ifFrist) {
+            LatLng ll = new LatLng(location.getLatitude(),
+                    location.getLongitude());
+            MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
+            // 移动到某经纬度
+            mBaidumap.animateMapStatus(update);
+            update = MapStatusUpdateFactory.zoomBy(5f);
+            // 放大
+            mBaidumap.animateMapStatus(update);
+
+            ifFrist = false;
+        }
+        // 显示个人位置图标
+        MyLocationData.Builder builder = new MyLocationData.Builder();
+        builder.latitude(location.getLatitude());
+        builder.longitude(location.getLongitude());
+        MyLocationData data = builder.build();
+        mBaidumap.setMyLocationData(data);
+    }
+
+
+    private Criteria getCriteria(){
+        Criteria criteria=new Criteria();
+        //设置定位精确度 Criteria.ACCURACY_COARSE比较粗略，Criteria.ACCURACY_FINE则比较精细
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        //设置是否要求速度
+        criteria.setSpeedRequired(false);
+        // 设置是否允许运营商收费
+        criteria.setCostAllowed(false);
+        //设置是否需要方位信息
+        criteria.setBearingRequired(false);
+        //设置是否需要海拔信息
+        criteria.setAltitudeRequired(false);
+        // 设置对电源的需求
+        criteria.setPowerRequirement(Criteria.POWER_HIGH);
+        return criteria;
+    }
+
+    public static double convertToDouble(String number, double defaultValue) {
+        if (TextUtils.isEmpty(number)) {
+            return defaultValue;
+        }
+        try {
+            return Double.parseDouble(number);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+
+    }
+
     private void Add_show(){
         Intent intent = new Intent();
         intent.setClass(getActivity(),Add_lamp.class);
@@ -165,6 +294,8 @@ public class MapFragment extends Fragment {
                 latitude = location.getLatitude();
                 longitude = location.getLongitude();
                 LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
+                //Toast.makeText(getActivity(),latitude+" "+latitude,Toast.LENGTH_SHORT).show();
+                Log.i("location", latitude+" "+longitude);
                 MapStatusUpdate status = MapStatusUpdateFactory.newLatLng(ll);
 
                 mBaidumap.animateMapStatus(status);//动画的方式到中间
@@ -199,6 +330,7 @@ public class MapFragment extends Fragment {
         marker = (Marker) mBaidumap.addOverlay(option);
         marker.setExtraInfo(bundle);
     }
+
     BaiduMap.OnMarkerClickListener markerClick = new BaiduMap.OnMarkerClickListener() {
         /**
          * 地图 Marker 覆盖物点击事件监听函数

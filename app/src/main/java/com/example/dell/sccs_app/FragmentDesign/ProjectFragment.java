@@ -45,15 +45,11 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
         mView = inflater.inflate(R.layout.project_list, container, false);
 
         initView();
-        initData();
-        if(project_get) {
-            if (projectTemp >= 0) {
-                project_list.setItemChecked(projectTemp, true);
-                tempProject.setText("当前项目组 | " + project_name.get(projectTemp));
-            }
-        }
-        else
-            Toast.makeText(getActivity(),"Pull to refresh",Toast.LENGTH_SHORT).show();
+
+
+        Handler handler = new Handler();
+        handler.postDelayed(new splashhandler(), 2000);
+
 
         project_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -95,14 +91,31 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
         tempProject.setText("当前项目组 | ");
     }
 
+    private class splashhandler implements Runnable
+    {
+        public void run()
+        {
+            initData();
+            if(project_get) {
+                if (projectTemp >= 0) {
+                    project_list.setItemChecked(projectTemp, true);
+                    tempProject.setText("当前项目组 | " + project_name.get(projectTemp));
+                }
+            }
+            else
+                Toast.makeText(getActivity(),"Pull to refresh",Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public void onRefresh(){
         Log.i("Refresh test","in");
         new Handler().postDelayed(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 mSwipeRefreshLayout.setRefreshing(false);
             }
-        }, 1000);
+        }, 2000);
         initData();
         if(project_get) {
             if (projectTemp >= 0) {
@@ -111,7 +124,7 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         }
         else
-            Toast.makeText(getActivity(),"Wait",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),"Pull to refresh",Toast.LENGTH_SHORT).show();
     }
 
 }
