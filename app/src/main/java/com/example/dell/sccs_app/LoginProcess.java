@@ -5,7 +5,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.CookieSyncManager;
 
+import com.example.dell.sccs_app.Bean.DeviceListBean;
+import com.example.dell.sccs_app.Bean.ElectricListBean;
+import com.example.dell.sccs_app.Bean.LampListBean;
+import com.example.dell.sccs_app.Bean.ProjectBean;
+import com.example.dell.sccs_app.Bean.StationBean;
 import com.example.dell.sccs_app.Util.Md5Util;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -35,8 +44,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.dell.sccs_app.StaticValue.ElectricListData;
+import static com.example.dell.sccs_app.StaticValue.LampListData;
+import static com.example.dell.sccs_app.StaticValue.StationData;
+import static com.example.dell.sccs_app.StaticValue.addContrallor;
+import static com.example.dell.sccs_app.StaticValue.addLamp;
+import static com.example.dell.sccs_app.StaticValue.askConcentratorUrl;
+import static com.example.dell.sccs_app.StaticValue.askElectricUrl;
+import static com.example.dell.sccs_app.StaticValue.askLampUrl;
+import static com.example.dell.sccs_app.StaticValue.askProjectListUrl;
 import static com.example.dell.sccs_app.StaticValue.connectState;
+import static com.example.dell.sccs_app.StaticValue.deviceListData;
+import static com.example.dell.sccs_app.StaticValue.infostate_1;
+import static com.example.dell.sccs_app.StaticValue.infostate_2;
+import static com.example.dell.sccs_app.StaticValue.logout;
+import static com.example.dell.sccs_app.StaticValue.projectData;
+import static com.example.dell.sccs_app.StaticValue.projectTemp;
+import static com.example.dell.sccs_app.StaticValue.project_get;
 import static com.example.dell.sccs_app.StaticValue.sid;
+import static com.example.dell.sccs_app.StaticValue.stationquery;
+import static com.example.dell.sccs_app.StaticValue.stationquery_all;
 import static com.example.dell.sccs_app.WebFunction.getRequestHeader;
 
 /**
@@ -299,6 +326,95 @@ public class LoginProcess extends AppCompatActivity {
         return axWebSID;
     }
 
+    public static String getProject(int con_type,String name,String cuid,double lat,double lng) {
+        String body = "";
+        String projectId = "";
+        String link = "";
+        projectTemp=0;
+        switch (con_type) {
+            case 1://获取项目
+                link = askProjectListUrl;
+                body = "{\"wheres\":[{\"k\":\"enabled\",\"o\":\"=\",\"v\":true}],\"orders\":[{\"k\":\"name\",\"v\":\"ASC\"}]}";
+                break;
+            case 2://集中器型号列表接口
+                link = askConcentratorUrl;
+                projectId = projectData.get(projectTemp).getId();
+                body = "{\"page\":1,\"pageSize\":50,\"wheres\":[{\"k\":\"projectId\",\"o\":\"=\",\"v\":\""+projectId+"\"}],\"orders\":[{\"k\":\"model\",\"v\":\"ASC\"}]}";
+                //body = "{\" wheres\":[{\"k\":\"projectId\",\"o\":\"=\",\"v\":\""+projectId+"\"}],\"orders\":[]}";
+                break;
+            case 3://电表型号接口
+                link = askElectricUrl;
+                projectId = projectData.get(projectTemp).getId();
+                body = "{\"wheres\":[{\"k\":\"asDefault\",\"o\":\"=\",\"v\":true},{\"k\":\"projectId\",\"o\":\"=\",\"v\":\""+projectId+"\"}],\"orders\":[]}";
+                break;
+
+            case 4://lamp interface
+                link = askLampUrl;
+                projectId = projectData.get(projectTemp).getId();
+                body = "{\"page\":1,\"pageSize\":50,\"wheres\":[{\"k\":\"projectId\",\"o\":\"=\",\"v\":\""+projectId+"\"}],\"orders\":[{\"k\":\"model\",\"v\":\"ASC\"}]}";
+                Log.i("body" ,body);
+                break;
+
+            case 6://add controller
+                link = addContrallor;
+                projectId = projectData.get(projectTemp).getId();
+                body = "{\"pid\":\""+projectId+"\",\"name\":\""+name+"\",\"cuid\":\""+cuid+"\",\"ctype\":1,\"cmodel\":\""+deviceListData.get(1).getModelId()+"\",\"devices\":[{\"deviceType\":2,\"modelId\":\""+ElectricListData.get(0).getModelId()+"\",\"name\":\"Built-in METER\"}],\"lat\":"+lat+",\"lng\":"+lng+"}";
+                Log.i("body" ,body);
+                break;
+            case 5:
+                link = stationquery_all;
+                projectId = projectData.get(0).getId();
+                body =  " {\"pid\":\""+projectId+"\"}";
+                break;
+            case 7:
+                link = stationquery;
+                body = "{\"wheres\":[{\"k\":\"stationId\",\"o\":\"=\",\"v\":\"a5cff7fddf19414289ea8d6959e1021b\"}],\"orders\":[]}";
+                break;
+            case 0:
+                link = logout;
+                break;
+            default:
+                break;
+
+        }
+        //登录服务器
+        HttpClient httpclient = new DefaultHttpClient();
+        // 创建cookie store的本地实例
+        CookieStore cookieStore = new BasicCookieStore();
+        // 创建本地的HTTP内容
+        HttpContext context = new BasicHttpContext();
+        //使用POST方法
+        HttpPost httpPost = new HttpPost(link+sid);
+        HttpResponse response = null;
+        try {
+            //httpPost发送的数据
+            StringEntity entity = new StringEntity(body);
+            httpPost.setEntity(entity);
+            httpPost.addHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0;Windows NT 5.1; SV1; .NET CLR 2.0.50727; CIBA)");
+            httpPost.addHeader("Content-Type", "text/plain");
+            // 设置以AJAX方式的http提交
+            httpPost.addHeader("X_REQUESTED_WITH", "XMLHttpRequest");
+            // 绑定cookie store到本地内容中
+            context.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+            response = httpclient.execute(httpPost, context); //httpclient.execute(httpPost);
+
+        }
+        catch (IOException e1) {
+            // TODO 自动生成的 catch 块
+            e1.printStackTrace();
+        }
+        String res = null;
+        try {
+            res = EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //res=res.substring(3);
+        System.out.print(res);
+        return res;
+    }
+
+
     public static String sid(String url){
         android.webkit.CookieManager cookieManager = android.webkit.CookieManager.getInstance();
         String cookie = cookieManager.getCookie(url);
@@ -311,6 +427,67 @@ public class LoginProcess extends AppCompatActivity {
         sid = Websid;
         connectState = true;
         return Websid;
+    }
+
+    public static void jsonTranslate(String  str,int type) {
+        //Json的解析类对象
+        JsonParser parser = new JsonParser();
+        //将JSON的String 转成一个JsonArray对象
+        JsonArray jsonArray = parser.parse(str).getAsJsonArray();
+        Gson gson = new Gson();
+        /*if(type == 1)
+        {
+            projectData.clear();//清除缓存
+            int i = 0;
+            for (JsonElement user : jsonArray) {
+                ProjectBean projectBean = gson.fromJson(user,ProjectBean.class);
+                projectData.add(i,projectBean);
+                Log.i("projectname",i+projectData.get(i).getName());
+                i++;
+            }
+            project_get = true;
+        }*/
+        if(type == 2) {
+            deviceListData.clear();
+            int i = 0;
+            for(JsonElement user : jsonArray) {
+                DeviceListBean device =  gson.fromJson(user,DeviceListBean.class);
+                deviceListData.add(i,device);
+                i++;
+            }
+            infostate_1 = true;
+            //Log.i("elecid",deviceListData.get(1).getModelId());
+        } else if(type == 3) {
+            ElectricListData.clear();
+            int i = 0;
+            for(JsonElement user : jsonArray) {
+                ElectricListBean device =  gson.fromJson(user,ElectricListBean.class);
+                ElectricListData.add(i,device);
+                i++;
+            }
+            infostate_2 = true;
+        }
+        else if(type == 4){
+            Log.i("im ","in");
+            LampListData.clear();
+            int i = 0;
+            for(JsonElement user : jsonArray) {
+                LampListBean device =  gson.fromJson(user,LampListBean.class);
+                LampListData.add(i,device);
+                i++;
+            }
+        }
+
+        else if(type == 5){
+            Log.i("im ","in");
+            StationData.clear();
+            int i = 0;
+            for(JsonElement user : jsonArray) {
+                StationBean station=  gson.fromJson(user,StationBean.class);
+                StationData.add(i,station);
+                i++;
+            }
+        }
     }
 
 

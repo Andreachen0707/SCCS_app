@@ -33,7 +33,9 @@ import android.widget.TextView;
 
 import com.example.dell.sccs_app.Bean.DeviceListBean;
 import com.example.dell.sccs_app.Bean.ElectricListBean;
+import com.example.dell.sccs_app.Bean.LampListBean;
 import com.example.dell.sccs_app.Bean.ProjectBean;
+import com.example.dell.sccs_app.Bean.StationBean;
 import com.example.dell.sccs_app.FragmentDesign.MapFragment;
 import com.example.dell.sccs_app.FragmentDesign.ProjectFragment;
 import com.example.dell.sccs_app.Util.DensityUtil;
@@ -95,7 +97,10 @@ import java.util.TimerTask;
 
 
 import static android.support.design.widget.TabLayout.MODE_SCROLLABLE;
+import static com.example.dell.sccs_app.LoginProcess.getProject;
 import static com.example.dell.sccs_app.StaticValue.ElectricListData;
+import static com.example.dell.sccs_app.StaticValue.LampListData;
+import static com.example.dell.sccs_app.StaticValue.StationData;
 import static com.example.dell.sccs_app.StaticValue.addContrallor;
 import static com.example.dell.sccs_app.StaticValue.addLamp;
 import static com.example.dell.sccs_app.StaticValue.askConcentratorUrl;
@@ -146,6 +151,7 @@ public class Project extends AppCompatActivity
     private  MyThread2 m1 = new MyThread2();
     private  MyThread2 m2 = new MyThread2();
     private  MyThread2 m3 = new MyThread2();
+    private  MyThread2 m4 = new MyThread2();
     private int mapIndex = 0;
 
     public static String username;
@@ -315,6 +321,7 @@ public class Project extends AppCompatActivity
         m1.setName(2);
         m2.setName(3);
         m3.setName(4);
+        m4.setName(5);
         new Thread(networkTask).start();
     }
 
@@ -529,7 +536,7 @@ public class Project extends AppCompatActivity
         @Override
         public void run() {
             int type = connectType;
-            String res = getProjectName(type);
+            String res = getProject(type,name,cuid,lat,lng);
             Message msg = new Message();
             Bundle data = new Bundle();
             data.putString("value", res);
@@ -552,8 +559,15 @@ public class Project extends AppCompatActivity
             // TODO
             // UI界面的更新等相关操作
             Log.i("fuck",type);
-            if(type.equals(0))
+            if(type.equals("0"))
                 Log.i("Log out","true");
+            if(type.equals("1")){
+                if (val.charAt(0) == '1') {
+                    val = val.substring(3);
+                    Log.i("typ_new", val);
+                    jsonProjectTranslate(val,Integer.parseInt(type));
+                }
+            }
 
             else {
                 if (val.charAt(0) == '1') {
@@ -569,7 +583,7 @@ public class Project extends AppCompatActivity
                         val = val.substring(3);
                         Log.i("typ1", val);
                     }
-                    jsonTranslate(val, Integer.parseInt(type));
+                    LoginProcess.jsonTranslate(val, Integer.parseInt(type));
                 }
             }
         }
@@ -584,7 +598,7 @@ public class Project extends AppCompatActivity
         }
         public void run()
         {
-            String res = getProjectName(type);
+            String res = getProject(type,name,cuid,lat,lng);
             Message msg = new Message();
             Bundle data = new Bundle();
             data.putString("value", res);
@@ -684,7 +698,7 @@ public class Project extends AppCompatActivity
         return res;
     }
 
-    public void jsonTranslate(String  str,int type) {
+    public void jsonProjectTranslate(String  str,int type) {
         //Json的解析类对象
         JsonParser parser = new JsonParser();
         //将JSON的String 转成一个JsonArray对象
@@ -704,35 +718,10 @@ public class Project extends AppCompatActivity
             new Thread(m1).start();
             new Thread(m2).start();
             new Thread(m3).start();
+            new Thread(m4).start();
         }
-        else if(type == 2) {
-            deviceListData.clear();
-            int i = 0;
-            for(JsonElement user : jsonArray) {
-                DeviceListBean device =  gson.fromJson(user,DeviceListBean.class);
-                deviceListData.add(i,device);
-                i++;
-            }
-            infostate_1 = true;
-            //Log.i("elecid",deviceListData.get(1).getModelId());
-        } else if(type == 3) {
-            ElectricListData.clear();
-            int i = 0;
-            for(JsonElement user : jsonArray) {
-                ElectricListBean device =  gson.fromJson(user,ElectricListBean.class);
-                ElectricListData.add(i,device);
-                i++;
-            }
-            infostate_2 = true;
-        }
-        else if(type == 6){
-            Log.i("im ","in");
-            ElectricListData.clear();
-            for(JsonElement user : jsonArray) {
-                ElectricListBean device =  gson.fromJson(user,ElectricListBean.class);
-                ElectricListData.add(device);
-            }
-        }
+        else
+            Log.i("failed","yes failed");
     }
 
     public void connectToServer(String ip, String port, String type) {

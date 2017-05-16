@@ -45,6 +45,7 @@ import com.example.dell.sccs_app.R;
 
 import java.util.List;
 
+import static com.example.dell.sccs_app.StaticValue.StationData;
 import static com.example.dell.sccs_app.StaticValue.addaction;
 
 /**
@@ -58,8 +59,8 @@ public class MapFragment extends Fragment {
     private com.getbase.floatingactionbutton.FloatingActionButton mAddaction;
     private com.getbase.floatingactionbutton.FloatingActionButton mGetaction;
 
-    private double longitude;
-    private double latitude;
+    private double mlongitude;
+    private double mlatitude;
     private LocationClient mLocationClient;
     private LocationManager locationManager;
     private String provider;
@@ -85,16 +86,14 @@ public class MapFragment extends Fragment {
         initMap();
         initLocation();
         //currentLocation();
+        //初始化以后要获得一系列的参数 去获取集中器和灯的地理位置 然后标记在地图上 check!
         Handler info = new Handler();
-
-
-        //初始化以后要获得一系列的参数 去获取集中器和灯的地理位置 然后标记在地图上
+        info.postDelayed(new maphandler(),2000);
 
 
         //添加新集中器时标记的方式
-        latitude = 30.00;
-        longitude = 120.00;
-        mapAnnotation();
+
+
 
         mAddaction.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -169,6 +168,32 @@ public class MapFragment extends Fragment {
         mLocationClient.start();
     }
 
+    private class maphandler implements Runnable
+    {
+        public void run()
+        {
+            if(StationData.size()!=0) {
+                for(int t = 0;t<StationData.size();t++) {
+                    mlatitude = StationData.get(t).getLat();
+                    mlongitude = StationData.get(t).getLng();
+
+                    LatLng sourceLatLng = new LatLng(mlatitude,mlongitude);
+                    CoordinateConverter converter  = new CoordinateConverter();
+                    converter.from(CoordinateConverter.CoordType.GPS);
+                    // sourceLatLng待转换坐标
+                    converter.coord(sourceLatLng);
+                    LatLng desLatLng = converter.convert();
+                    mlatitude = desLatLng.latitude;
+                    mlongitude = desLatLng.longitude;
+
+                    mapAnnotation(StationData.get(t).getName(),mlatitude,mlongitude);
+                }
+            }
+            else
+                Toast.makeText(getActivity(),"Pull to refresh",Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public static double convertToDouble(String number, double defaultValue) {
         if (TextUtils.isEmpty(number)) {
             return defaultValue;
@@ -202,11 +227,11 @@ public class MapFragment extends Fragment {
             mBaidumap.setMyLocationData(data);
             if (isFirstLocation) {
                 //获取经纬度
-                latitude = location.getLatitude();
-                longitude = location.getLongitude();
+                mlatitude = location.getLatitude();
+                mlongitude = location.getLongitude();
                 LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
                 //Toast.makeText(getActivity(),latitude+" "+latitude,Toast.LENGTH_SHORT).show();
-                Log.i("location", latitude+" "+longitude);
+                Log.i("location", mlatitude+" "+mlongitude);
                 MapStatusUpdate status = MapStatusUpdateFactory.newLatLng(ll);
 
                 mBaidumap.animateMapStatus(status);//动画的方式到中间
@@ -223,11 +248,11 @@ public class MapFragment extends Fragment {
 
     }
 
-    public void mapAnnotation()
+    public void mapAnnotation(String name,double lat,double lng)
     {
         Marker marker = null;
         //定义Maker坐标点
-        LatLng point = new LatLng(latitude, longitude);
+        LatLng point = new LatLng(lat, lng);
         //构建Marker图标
         BitmapDescriptor bitmap = BitmapDescriptorFactory
                 .fromResource(R.drawable.ic_icon_controler_gray);
@@ -236,7 +261,7 @@ public class MapFragment extends Fragment {
                 .position(point)
                 .icon(bitmap);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("info", "test");
+        bundle.putSerializable("info", name);
         //在地图上添加Marker，并显示
         marker = (Marker) mBaidumap.addOverlay(option);
         marker.setExtraInfo(bundle);
