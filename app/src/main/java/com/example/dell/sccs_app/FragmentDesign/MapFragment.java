@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -88,6 +89,8 @@ public class MapFragment extends Fragment {
     private EditText UID;
     private EditText GPS_1;
     private EditText GPS_2;
+    private Button ok;
+    private Button cancel;
 
 
     @Override
@@ -232,6 +235,8 @@ public class MapFragment extends Fragment {
         final Dialog bottomDialog = new Dialog(getActivity(), R.style.BottomDialog);
         View contentView = LayoutInflater.from(getActivity()).inflate(R.layout.activity_add_lamp, null);
         bottomDialog.setContentView(contentView);
+        bottomDialog.setCanceledOnTouchOutside(true);
+
         scan = (com.getbase.floatingactionbutton.FloatingActionButton)contentView.findViewById(R.id.scan);
         input = (com.getbase.floatingactionbutton.FloatingActionButton)contentView.findViewById(R.id.input);
 
@@ -261,7 +266,7 @@ public class MapFragment extends Fragment {
     }
 
     private void Commit_show(String res){
-        Dialog bottomDialog = new Dialog(getActivity(), R.style.BottomDialog);
+        final Dialog bottomDialog = new Dialog(getActivity(), R.style.BottomDialog);
         View contentView = LayoutInflater.from(getActivity()).inflate(R.layout.activity_commit, null);
         bottomDialog.setContentView(contentView);
 
@@ -269,7 +274,8 @@ public class MapFragment extends Fragment {
         UID = (EditText) contentView.findViewById(R.id.Text2);
         GPS_1 = (EditText) contentView.findViewById(R.id.Text3);
         GPS_2 = (EditText) contentView.findViewById(R.id.Text4);
-
+        ok = (Button) contentView.findViewById(R.id.okButton);
+        cancel = (Button) contentView.findViewById(R.id.cancelButton);
 
         String str ="000000000000";
         res=str.substring(0, 12-res.length())+res;
@@ -285,6 +291,22 @@ public class MapFragment extends Fragment {
         bottomDialog.getWindow().setGravity(Gravity.BOTTOM);
         bottomDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
         bottomDialog.show();
+
+        ok.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                //上传到服务器同时更新
+                mapAnnotation(NAME.getText().toString(),convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                //cancel
+                bottomDialog.dismiss();
+            }
+        });
 
     }
 
