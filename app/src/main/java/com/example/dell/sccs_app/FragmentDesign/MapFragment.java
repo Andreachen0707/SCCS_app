@@ -50,6 +50,7 @@ import com.example.dell.sccs_app.Project;
 import com.example.dell.sccs_app.R;
 import com.example.dell.sccs_app.Util.DensityUtil;
 import com.google.zxing.client.android.CaptureActivity;
+import com.google.zxing.common.StringUtils;
 
 import java.util.List;
 
@@ -268,6 +269,10 @@ public class MapFragment extends Fragment {
         UID = (EditText) contentView.findViewById(R.id.Text2);
         GPS_1 = (EditText) contentView.findViewById(R.id.Text3);
         GPS_2 = (EditText) contentView.findViewById(R.id.Text4);
+
+
+        String str ="000000000000";
+        res=str.substring(0, 12-res.length())+res;
 
         UID.setText(res);
         GPS_1.setText(String.valueOf(mlatitude));
