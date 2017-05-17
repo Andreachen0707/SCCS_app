@@ -18,6 +18,7 @@ package com.google.zxing.client.android;
 
 import com.example.dell.sccs_app.Add_lamp;
 import com.example.dell.sccs_app.Commit;
+import com.example.dell.sccs_app.FragmentDesign.MapFragment;
 import com.example.dell.sccs_app.R;
 import com.example.dell.sccs_app.Scan;
 import com.example.dell.sccs_app.Setting;
@@ -758,13 +759,13 @@ public final class CaptureActivity extends AppCompatActivity implements SurfaceH
       beepManager.playBeepSoundAndVibrate();
       //Toast.makeText(CaptureActivity.this,rawResult.getText(),Toast.LENGTH_SHORT).show();
 
-      Intent intent = new Intent();
-      intent.setClass(CaptureActivity.this,Commit.class);
+      Intent intent = getIntent();
+      setResult(0x123,intent.putExtra("scan_result",rawResult.getText()));
 
     //  Bundle bundle= new Bundle();
     //  bundle.putString("scan_result",rawResult.getText());
-      intent.putExtra("scan_result",rawResult.getText());
-      startActivity(intent);
+     // intent.putExtra("scan_result",rawResult.getText());
+      //startActivity(intent);
       finish();
 
     }

@@ -1,6 +1,7 @@
 package com.example.dell.sccs_app.FragmentDesign;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,9 +15,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,11 +42,14 @@ import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.Text;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.CoordinateConverter;
 import com.example.dell.sccs_app.Add_lamp;
 import com.example.dell.sccs_app.Project;
 import com.example.dell.sccs_app.R;
+import com.example.dell.sccs_app.Util.DensityUtil;
+import com.google.zxing.client.android.CaptureActivity;
 
 import java.util.List;
 
@@ -56,8 +64,8 @@ public class MapFragment extends Fragment {
     private MapView mMapView = null;
     private BaiduMap mBaidumap;
 
-    private com.getbase.floatingactionbutton.FloatingActionButton mAddaction;
-    private com.getbase.floatingactionbutton.FloatingActionButton mGetaction;
+    private com.getbase.floatingactionbutton.FloatingActionButton mAddLamp;
+    private com.getbase.floatingactionbutton.FloatingActionButton mAddControllor;
 
     private double mlongitude;
     private double mlatitude;
@@ -72,16 +80,22 @@ public class MapFragment extends Fragment {
     private MyLocationListener mLocationListener;
     private boolean isFirstLocation = true;
 
+    private com.getbase.floatingactionbutton.FloatingActionButton scan;
+    private com.getbase.floatingactionbutton.FloatingActionButton input;
+
+    private EditText NAME;
+    private EditText UID;
+    private EditText GPS_1;
+    private EditText GPS_2;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         SDKInitializer.initialize(getActivity().getApplicationContext());
-
-
         mView = inflater.inflate(R.layout.map_fragment, container, false);
 
-        mAddaction = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemLamp);
-        mGetaction = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemControl);
+        mAddLamp = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemLamp);
+        mAddControllor = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemControl);
 
         initMap();
         initLocation();
@@ -95,17 +109,19 @@ public class MapFragment extends Fragment {
 
 
 
-        mAddaction.setOnClickListener(new View.OnClickListener(){
+        mAddLamp.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
                 addaction = 0;
-                Add_show();
+                Add_scan_show();
             }
         });
 
-        mGetaction.setOnClickListener(new View.OnClickListener(){
+        mAddControllor.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                addaction = 1;
+                Add_scan_show();
                 // Fragment_Project.notify();
             }
         });
@@ -174,19 +190,19 @@ public class MapFragment extends Fragment {
         {
             if(StationData.size()!=0) {
                 for(int t = 0;t<StationData.size();t++) {
-                    mlatitude = StationData.get(t).getLat();
-                    mlongitude = StationData.get(t).getLng();
+                    double slatitude = StationData.get(t).getLat();
+                    double slongitude = StationData.get(t).getLng();
 
-                    LatLng sourceLatLng = new LatLng(mlatitude,mlongitude);
+                    LatLng sourceLatLng = new LatLng(slatitude,slongitude);
                     CoordinateConverter converter  = new CoordinateConverter();
                     converter.from(CoordinateConverter.CoordType.GPS);
                     // sourceLatLng待转换坐标
                     converter.coord(sourceLatLng);
                     LatLng desLatLng = converter.convert();
-                    mlatitude = desLatLng.latitude;
-                    mlongitude = desLatLng.longitude;
+                    slatitude = desLatLng.latitude;
+                    slongitude = desLatLng.longitude;
 
-                    mapAnnotation(StationData.get(t).getName(),mlatitude,mlongitude);
+                    mapAnnotation(StationData.get(t).getName(),slatitude,slongitude);
                 }
             }
             else
@@ -206,10 +222,95 @@ public class MapFragment extends Fragment {
 
     }
 
-    private void Add_show(){
-        Intent intent = new Intent();
-        intent.setClass(getActivity(),Add_lamp.class);
-        startActivity(intent);
+    private void Add_scan_show(){
+        /**
+         *  Intent intent = new Intent();
+         *  intent.setClass(getActivity(),Add_lamp.class);
+         *  startActivity(intent);
+         */
+        final Dialog bottomDialog = new Dialog(getActivity(), R.style.BottomDialog);
+        View contentView = LayoutInflater.from(getActivity()).inflate(R.layout.activity_add_lamp, null);
+        bottomDialog.setContentView(contentView);
+        scan = (com.getbase.floatingactionbutton.FloatingActionButton)contentView.findViewById(R.id.scan);
+        input = (com.getbase.floatingactionbutton.FloatingActionButton)contentView.findViewById(R.id.input);
+
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) contentView.getLayoutParams();
+        params.width = getResources().getDisplayMetrics().widthPixels - DensityUtil.dp2px(getActivity(), 16f);
+        params.bottomMargin = DensityUtil.dp2px(getActivity(), 8f);
+        contentView.setLayoutParams(params);
+        bottomDialog.getWindow().setGravity(Gravity.BOTTOM);
+        bottomDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
+        bottomDialog.show();
+
+        scan.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent();
+                intent.setClass(getActivity(), CaptureActivity.class);
+                startActivityForResult(intent,addaction);
+            }
+        });
+
+        input.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Commit_show("");
+            }
+        });
+    }
+
+    private void Commit_show(String res){
+        Dialog bottomDialog = new Dialog(getActivity(), R.style.BottomDialog);
+        View contentView = LayoutInflater.from(getActivity()).inflate(R.layout.activity_commit, null);
+        bottomDialog.setContentView(contentView);
+
+        NAME = (EditText) contentView.findViewById(R.id.Text);
+        UID = (EditText) contentView.findViewById(R.id.Text2);
+        GPS_1 = (EditText) contentView.findViewById(R.id.Text3);
+        GPS_2 = (EditText) contentView.findViewById(R.id.Text4);
+
+        UID.setText(res);
+        GPS_1.setText(String.valueOf(mlatitude));
+        GPS_2.setText(String.valueOf(mlongitude));
+
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) contentView.getLayoutParams();
+        params.width = getResources().getDisplayMetrics().widthPixels - DensityUtil.dp2px(getActivity(), 16f);
+        params.bottomMargin = DensityUtil.dp2px(getActivity(), 8f);
+        contentView.setLayoutParams(params);
+        bottomDialog.getWindow().setGravity(Gravity.BOTTOM);
+        bottomDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
+        bottomDialog.show();
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((resultCode == 0x123)) {
+                if (null != data) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle == null)
+                        return;
+
+                    else {
+                        String res = bundle.getString("scan_result");
+                        switch (requestCode) {
+                            case 0:
+                                Log.i("scan_test","in");
+                                Commit_show(res);
+                                break;
+
+                            case 1:
+                               Commit_show(res);
+                                break;
+                            default:
+                                break;
+
+                    }
+                }
+            }
+
+        }
     }
 
 
