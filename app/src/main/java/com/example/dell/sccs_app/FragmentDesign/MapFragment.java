@@ -11,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -47,16 +48,21 @@ import com.baidu.mapapi.map.Text;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.CoordinateConverter;
 import com.example.dell.sccs_app.Add_lamp;
+import com.example.dell.sccs_app.LoginProcess;
 import com.example.dell.sccs_app.Project;
 import com.example.dell.sccs_app.R;
 import com.example.dell.sccs_app.Util.DensityUtil;
+import com.example.dell.sccs_app.Util.GPS;
+import com.example.dell.sccs_app.Util.GPS_convert;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.common.StringUtils;
 
 import java.util.List;
 
+import static com.example.dell.sccs_app.LoginProcess.getProject;
 import static com.example.dell.sccs_app.StaticValue.StationData;
 import static com.example.dell.sccs_app.StaticValue.addaction;
+import static com.example.dell.sccs_app.Util.GPS_convert.bd09_To_Gps84;
 
 /**
  * Created by dell on 2017/5/4.
@@ -71,6 +77,8 @@ public class MapFragment extends Fragment {
 
     private double mlongitude;
     private double mlatitude;
+    private double gpslongitude;
+    private double gpslatitude;
     private LocationClient mLocationClient;
     private LocationManager locationManager;
     private String provider;
@@ -92,6 +100,13 @@ public class MapFragment extends Fragment {
     private Button ok;
     private Button cancel;
 
+    private MyUpdate upload = new MyUpdate();
+    private String name;
+    private String cuid;
+    private String luid;
+
+    private Project.WebClient testClient;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -101,12 +116,18 @@ public class MapFragment extends Fragment {
         mAddLamp = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemLamp);
         mAddControllor = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemControl);
 
+
         initMap();
         initLocation();
         //currentLocation();
         //初始化以后要获得一系列的参数 去获取集中器和灯的地理位置 然后标记在地图上 check!
-        Handler info = new Handler();
-        info.postDelayed(new maphandler(),2000);
+        //Handler info = new Handler();
+        handler.postDelayed(new maphandler(),2000);
+
+        //调用client发送是可以的
+        testClient = ((Project)getActivity()).getmClient();
+        testClient.senddata("login", "heart-beat","1","zh_CN","" , "0" , "");
+
 
 
         //添加新集中器时标记的方式
@@ -206,7 +227,7 @@ public class MapFragment extends Fragment {
                     slatitude = desLatLng.latitude;
                     slongitude = desLatLng.longitude;
 
-                    mapAnnotation(StationData.get(t).getName(),slatitude,slongitude);
+                    mapAnnotation(StationData.get(t).getName(),StationData.get(t).getCuid(),slatitude,slongitude);
                 }
             }
             else
@@ -276,6 +297,7 @@ public class MapFragment extends Fragment {
         GPS_2 = (EditText) contentView.findViewById(R.id.Text4);
         ok = (Button) contentView.findViewById(R.id.okButton);
         cancel = (Button) contentView.findViewById(R.id.cancelButton);
+        //currentLocation();
 
         String str ="000000000000";
         res=str.substring(0, 12-res.length())+res;
@@ -292,11 +314,32 @@ public class MapFragment extends Fragment {
         bottomDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
         bottomDialog.show();
 
+        GPS gps = new GPS(mlatitude,mlongitude);
+        GPS upgps = bd09_To_Gps84(gps.getWgLat(),gps.getWgLon());
+        gpslatitude = upgps.getWgLat();
+        gpslongitude = upgps.getWgLon();
+
         ok.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 //上传到服务器同时更新
-                mapAnnotation(NAME.getText().toString(),convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
+                if(addaction==0){
+                    //添加灯的语句
+                    upload.setName(6);
+                    name = NAME.getText().toString();
+                    luid = UID.getText().toString();
+
+                }
+                else {
+                    //添加集中器的语句
+                    upload.setName(6);
+                    name = NAME.getText().toString();
+                    cuid = UID.getText().toString();
+                }
+
+                new Thread(upload).start();
+                mapAnnotation(name,cuid,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
+                bottomDialog.dismiss();
             }
         });
 
@@ -376,7 +419,7 @@ public class MapFragment extends Fragment {
 
     }
 
-    public void mapAnnotation(String name,double lat,double lng)
+    public void mapAnnotation(String name,String cuid,double lat,double lng)
     {
         Marker marker = null;
         //定义Maker坐标点
@@ -390,6 +433,7 @@ public class MapFragment extends Fragment {
                 .icon(bitmap);
         Bundle bundle = new Bundle();
         bundle.putSerializable("info", name);
+        bundle.putSerializable("cuid",cuid);
         //在地图上添加Marker，并显示
         marker = (Marker) mBaidumap.addOverlay(option);
         marker.setExtraInfo(bundle);
@@ -404,7 +448,7 @@ public class MapFragment extends Fragment {
             InfoWindow mInfoWindow;
 
             Bundle res = marker.getExtraInfo();
-            String a = res.getString("info");
+            String a = res.getString("cuid");
             TextView location = new TextView(getActivity().getApplicationContext());
             location.setPadding(30, 20, 30, 50);
             location.setText(a);
@@ -446,6 +490,60 @@ public class MapFragment extends Fragment {
 
         mMapView.onPause();
     }
+
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Bundle data = msg.getData();
+            String val = data.getString("value");
+            String type = data.getString("type");
+            Log.i("mylog", "请求结果为-->" + val);
+            // TODO
+            // UI界面的更新等相关操作
+            Log.i("fuck",type);
+            if("0".equals(type))
+                Log.i("Log out","true");
+
+            else {
+                if (val.charAt(0) == '1') {
+                    if (val.charAt(3) != '[') {
+                        StringBuffer sb = new StringBuffer();
+                        String input = "[";
+                        String output = "]";
+                        val = val.substring(3);
+                        sb.append(input).append(val).append(output);
+                        val = sb.toString();
+                        Log.i("typ2", val);
+                    } else {
+                        val = val.substring(3);
+                        Log.i("typ1", val);
+                    }
+                    LoginProcess.jsonTranslate(val, Integer.parseInt(type));
+                }
+            }
+        }
+    };
+
+    private class MyUpdate implements Runnable
+    {
+        private int type;
+        public void setName(int name)
+        {
+            this.type = name;
+        }
+        public void run()
+        {
+            String res = getProject(type,name,cuid,gpslatitude,gpslongitude);
+            Message msg = new Message();
+            Bundle data = new Bundle();
+            data.putString("value", res);
+            data.putString("type", String.valueOf(type));
+            msg.setData(data);
+            handler.sendMessage(msg);
+        }
+    }
+
 }
 
 

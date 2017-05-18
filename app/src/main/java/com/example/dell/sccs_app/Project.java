@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.dell.sccs_app.Bean.DeviceListBean;
 import com.example.dell.sccs_app.Bean.ElectricListBean;
@@ -559,31 +560,35 @@ public class Project extends AppCompatActivity
             // TODO
             // UI界面的更新等相关操作
             Log.i("fuck",type);
-            if(type.equals("0"))
-                Log.i("Log out","true");
-            if(type.equals("1")){
-                if (val.charAt(0) == '1') {
-                    val = val.substring(3);
-                    Log.i("typ_new", val);
-                    jsonProjectTranslate(val,Integer.parseInt(type));
-                }
+            if("".equals(val)) {
+                Toast.makeText(Project.this,"Log out successful",Toast.LENGTH_SHORT).show();
             }
-
             else {
-                if (val.charAt(0) == '1') {
-                    if (val.charAt(3) != '[') {
-                        StringBuffer sb = new StringBuffer();
-                        String input = "[";
-                        String output = "]";
+                if ("1".equals(type)) {
+                    if (val.charAt(0) == '1') {
                         val = val.substring(3);
-                        sb.append(input).append(val).append(output);
-                        val = sb.toString();
-                        Log.i("typ2", val);
-                    } else {
-                        val = val.substring(3);
-                        Log.i("typ1", val);
+                        Log.i("type_new", val);
+                        jsonProjectTranslate(val, Integer.parseInt(type));
                     }
-                    LoginProcess.jsonTranslate(val, Integer.parseInt(type));
+                }
+                else {
+                    if (val.charAt(0) == '1') {
+                        if (val.charAt(3) != '[') {
+                            StringBuffer sb = new StringBuffer();
+                            String input = "[";
+                            String output = "]";
+                            val = val.substring(3);
+                            sb.append(input).append(val).append(output);
+                            val = sb.toString();
+                            Log.i("typ2", val);
+                        } else {
+                            val = val.substring(3);
+                            Log.i("typ1", val);
+                        }
+                        LoginProcess.jsonTranslate(val, Integer.parseInt(type));
+                    }
+                    else
+                        Toast.makeText(Project.this,"Error",Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -730,7 +735,7 @@ public class Project extends AppCompatActivity
 
         try {
             URI uri = new URI(address);
-            if(type == "1"){
+            if("1".equals(type)){
                 mClient = new WebClient(uri,draft);
                 mClient.connect();
                 if(mClient.isOpen()) {
@@ -756,7 +761,7 @@ public class Project extends AppCompatActivity
             }
             else if(type == "0"){
                 mClient.connect();
-                if(mClient.isOpen()==true) {
+                if(mClient.isOpen()) {
                     startHeartTimer(true);
                     Log.i("Test new","Success");
                 }
@@ -959,11 +964,12 @@ public class Project extends AppCompatActivity
             }
         }
 
-
-
-
         public int getNextMappingIndex() {
             return mapIndex++;
         }
+    }
+
+    public WebClient getmClient(){
+        return mClient;
     }
 }
