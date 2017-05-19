@@ -111,6 +111,7 @@ public class MapFragment extends Fragment {
     private String name;
     private String cuid;
     private String luid;
+    private String lmodel;
 
     private Project.WebClient testClient;
 
@@ -349,15 +350,13 @@ public class MapFragment extends Fragment {
                 public void onItemSelected(AdapterView<?> parent, View view,
                                            int position, long id) {
 
-                    //拿到被选择项的值
-                    String lamp_model_name = (String) list_lamp.getSelectedItem();
-                    //把该值传给 TextView
+                    //拿到被选择项的值,传给上传的指令
+                    lmodel = (String) list_lamp.getSelectedItem();
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
                     // TODO Auto-generated method stub
-
                 }
             });
 
@@ -388,7 +387,7 @@ public class MapFragment extends Fragment {
                     }
                     else {
                         //添加集中器的语句
-                        upload.setName(6);
+                        upload.setName(7);
                         name = NAME.getText().toString();
                         cuid = UID.getText().toString();
                     }
@@ -438,7 +437,7 @@ public class MapFragment extends Fragment {
                     //上传到服务器同时更新
                     if(addaction==0){
                         //添加灯的语句
-                        upload.setName(6);
+                        upload.setName(7);
                         name = NAME.getText().toString();
                         luid = UID.getText().toString();
 

@@ -4,6 +4,7 @@ import com.example.dell.sccs_app.Bean.ConcentratorBean;
 import com.example.dell.sccs_app.Bean.DeviceListBean;
 import com.example.dell.sccs_app.Bean.ElectricListBean;
 import com.example.dell.sccs_app.Bean.LampListBean;
+import com.example.dell.sccs_app.Bean.LcuBean;
 import com.example.dell.sccs_app.Bean.ProjectBean;
 import com.example.dell.sccs_app.Bean.StationBean;
 
@@ -23,10 +24,10 @@ public class StaticValue {
     public static String connectURL = basicURL+"/api/json?cmd=login&ctrl=user&version=1&lang=zh_CN";
     public static String sid;
     public static String logout = basicURL+"/api/json?cmd=login&ctrl=logout&version=1&lang=zh_CN&sid=";
-    public static String heartUrl = "http://121.40.34.92:7070/api/json?cmd=login&ctrl=heart-beat&version=1&lang=zh_CN&sid=";
-    public static String askProjectListUrl = "http://121.40.34.92:7070/api/json?cmd=project&ctrl=list&version=1&lang=zh_CN&sid=";
-    public static String askStationListUrl = "http://121.40.34.92:7070/api/json?cmd=station-info&ctrl=list&version=1&lang=zh_CN&sid=";
-    public static String askConcentratorUrl = "http://121.40.34.92:7070/api/json?cmd=modelRtu&ctrl=page&version=1&lang=zh_CN&sid=";
+    public static String heartUrl = basicURL+"/api/json?cmd=login&ctrl=heart-beat&version=1&lang=zh_CN&sid=";
+    public static String askProjectListUrl = basicURL+"/api/json?cmd=project&ctrl=list&version=1&lang=zh_CN&sid=";
+    public static String askStationListUrl = basicURL+"/api/json?cmd=station-info&ctrl=list&version=1&lang=zh_CN&sid=";
+    public static String askConcentratorUrl = basicURL+"/api/json?cmd=modelRtu&ctrl=page&version=1&lang=zh_CN&sid=";
     public static String askElectricUrl = "http://121.40.34.92:7070/api/json?cmd=modelMeter&ctrl=list&version=1&lang=zh_CN&sid=";
     public static String askLampUrl = "http://121.40.34.92:7070/api/json?cmd=modellamp&ctrl=page&version=1&lang=zh_CN&sid=";
     public static String askLucUrl = "http://121.40.34.92:7070/api/json?cmd=modelLcu&ctrl=list&version=1&lang=zh_CN&sid=";
@@ -38,6 +39,7 @@ public class StaticValue {
     public static String addlamp = "http://121.40.34.92:7070/api/json?cmd=lamp&ctrl=latlng&version=1&lang=zh_CN&sid=";
     public static String addlamp2 = "http://121.40.34.92:7070/api/json?cmd=lamps&ctrl=add&version=1&lang=zh_CN&sid=";
     public static String stationquery = "http://121.40.34.92:7070/api/json?cmd=station&ctrl=get&version=1&lang=zh_CN&sid=";
+    public static String deletestation = "http://121.40.34.92:7070/api/json?cmd=station&ctrl=deletes&version=1&lang=zh_CN&sid=";
 
 
     //所有控制柜的信息
@@ -49,6 +51,7 @@ public class StaticValue {
     public static ArrayList<ElectricListBean> ElectricListData = new ArrayList<>();
     public static ArrayList<LampListBean> LampListData = new ArrayList<>();
     public static ArrayList<StationBean> StationData = new ArrayList<>();
+    public static ArrayList<LcuBean> LcuData = new ArrayList<>();
     public static int projectTemp = 0;
     public static int addaction = 0;
 }

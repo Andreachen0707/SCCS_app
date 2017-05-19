@@ -8,6 +8,7 @@ import android.webkit.CookieSyncManager;
 import com.example.dell.sccs_app.Bean.DeviceListBean;
 import com.example.dell.sccs_app.Bean.ElectricListBean;
 import com.example.dell.sccs_app.Bean.LampListBean;
+import com.example.dell.sccs_app.Bean.LcuBean;
 import com.example.dell.sccs_app.Bean.ProjectBean;
 import com.example.dell.sccs_app.Bean.StationBean;
 import com.example.dell.sccs_app.Util.Md5Util;
@@ -46,12 +47,14 @@ import java.util.Map;
 
 import static com.example.dell.sccs_app.StaticValue.ElectricListData;
 import static com.example.dell.sccs_app.StaticValue.LampListData;
+import static com.example.dell.sccs_app.StaticValue.LcuData;
 import static com.example.dell.sccs_app.StaticValue.StationData;
 import static com.example.dell.sccs_app.StaticValue.addContrallor;
 import static com.example.dell.sccs_app.StaticValue.addLamp;
 import static com.example.dell.sccs_app.StaticValue.askConcentratorUrl;
 import static com.example.dell.sccs_app.StaticValue.askElectricUrl;
 import static com.example.dell.sccs_app.StaticValue.askLampUrl;
+import static com.example.dell.sccs_app.StaticValue.askLucUrl;
 import static com.example.dell.sccs_app.StaticValue.askProjectListUrl;
 import static com.example.dell.sccs_app.StaticValue.connectState;
 import static com.example.dell.sccs_app.StaticValue.deviceListData;
@@ -348,26 +351,34 @@ public class LoginProcess extends AppCompatActivity {
                 body = "{\"wheres\":[{\"k\":\"asDefault\",\"o\":\"=\",\"v\":true},{\"k\":\"projectId\",\"o\":\"=\",\"v\":\""+projectId+"\"}],\"orders\":[]}";
                 break;
 
-            case 4://lamp interface
+            case 4://灯具型号
                 link = askLampUrl;
                 projectId = projectData.get(projectTemp).getId();
                 body = "{\"page\":1,\"pageSize\":50,\"wheres\":[{\"k\":\"projectId\",\"o\":\"=\",\"v\":\""+projectId+"\"}],\"orders\":[{\"k\":\"model\",\"v\":\"ASC\"}]}";
                 Log.i("body" ,body);
                 break;
 
-            case 6://add controller
+            case 5:
+                link = stationquery_all;
+                projectId = projectData.get(projectTemp).getId();
+                body =  " {\"pid\":\""+projectId+"\"}";
+                break;
+
+            case 6:
+                link = askLucUrl;
+                projectId = projectData.get(projectTemp).getId();
+                body = "{\"wheres\":[{\"k\":\"projectId\",\"o\":\"=\",\"v\":\""+projectId+"\"}],\"orders\":[]}";
+                break;
+
+            case 7://add controller
                 link = addContrallor;
                 projectId = projectData.get(projectTemp).getId();
                 body = "{\"pid\":\""+projectId+"\",\"name\":\""+name+"\",\"cuid\":\""+cuid+"\",\"ctype\":1,\"cmodel\":\""+deviceListData.get(1).getModelId()+"\",\"devices\":[{\"deviceType\":2,\"modelId\":\""+ElectricListData.get(0).getModelId()+"\",\"name\":\"Built-in METER\"}],\"lat\":"+lat+",\"lng\":"+lng+"}";
                 Log.i("body" ,body);
                 break;
-            case 5:
-                link = stationquery_all;
-                projectId = projectData.get(0).getId();
-                body =  " {\"pid\":\""+projectId+"\"}";
-                break;
-            case 7:
-                link = stationquery;
+
+            case 8:
+                link = addLamp;
                 body = "{\"wheres\":[{\"k\":\"stationId\",\"o\":\"=\",\"v\":\"a5cff7fddf19414289ea8d6959e1021b\"}],\"orders\":[]}";
                 break;
             case 0:
@@ -485,6 +496,15 @@ public class LoginProcess extends AppCompatActivity {
             for(JsonElement user : jsonArray) {
                 StationBean station=  gson.fromJson(user,StationBean.class);
                 StationData.add(i,station);
+                i++;
+            }
+        }
+        else if(type == 6){
+            LcuData.clear();
+            int i = 0;
+            for(JsonElement user : jsonArray) {
+                LcuBean lcumodel=  gson.fromJson(user,LcuBean.class);
+                LcuData.add(i,lcumodel);
                 i++;
             }
         }

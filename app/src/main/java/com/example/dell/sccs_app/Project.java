@@ -153,6 +153,7 @@ public class Project extends AppCompatActivity
     private  MyThread2 m2 = new MyThread2();
     private  MyThread2 m3 = new MyThread2();
     private  MyThread2 m4 = new MyThread2();
+    private  MyThread2 m5 = new MyThread2();
     private int mapIndex = 0;
 
     public static String username;
@@ -323,6 +324,7 @@ public class Project extends AppCompatActivity
         m2.setName(3);
         m3.setName(4);
         m4.setName(5);
+        m5.setName(6);
         new Thread(networkTask).start();
     }
 
@@ -724,6 +726,7 @@ public class Project extends AppCompatActivity
             new Thread(m2).start();
             new Thread(m3).start();
             new Thread(m4).start();
+            new Thread(m5).start();
         }
         else
             Log.i("failed","yes failed");
