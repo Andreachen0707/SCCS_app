@@ -22,8 +22,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,9 +61,12 @@ import com.example.dell.sccs_app.Util.GPS_convert;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.common.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static android.drm.DrmStore.DrmObjectType.CONTENT;
 import static com.example.dell.sccs_app.LoginProcess.getProject;
+import static com.example.dell.sccs_app.StaticValue.LampListData;
 import static com.example.dell.sccs_app.StaticValue.StationData;
 import static com.example.dell.sccs_app.StaticValue.addaction;
 import static com.example.dell.sccs_app.Util.GPS_convert.bd09_To_Gps84;
@@ -127,7 +134,6 @@ public class MapFragment extends Fragment {
         //调用client发送是可以的
         testClient = ((Project)getActivity()).getmClient();
         testClient.senddata("login", "heart-beat","1","zh_CN","" , "0" , "");
-
 
 
         //添加新集中器时标记的方式
@@ -288,68 +294,186 @@ public class MapFragment extends Fragment {
 
     private void Commit_show(String res){
         final Dialog bottomDialog = new Dialog(getActivity(), R.style.BottomDialog);
-        View contentView = LayoutInflater.from(getActivity()).inflate(R.layout.activity_commit, null);
-        bottomDialog.setContentView(contentView);
-
-        NAME = (EditText) contentView.findViewById(R.id.Text);
-        UID = (EditText) contentView.findViewById(R.id.Text2);
-        GPS_1 = (EditText) contentView.findViewById(R.id.Text3);
-        GPS_2 = (EditText) contentView.findViewById(R.id.Text4);
-        ok = (Button) contentView.findViewById(R.id.okButton);
-        cancel = (Button) contentView.findViewById(R.id.cancelButton);
-        //currentLocation();
-
+        //补全字符
         String str ="000000000000";
         res=str.substring(0, 12-res.length())+res;
 
-        UID.setText(res);
-        GPS_1.setText(String.valueOf(mlatitude));
-        GPS_2.setText(String.valueOf(mlongitude));
-
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) contentView.getLayoutParams();
-        params.width = getResources().getDisplayMetrics().widthPixels - DensityUtil.dp2px(getActivity(), 16f);
-        params.bottomMargin = DensityUtil.dp2px(getActivity(), 8f);
-        contentView.setLayoutParams(params);
-        bottomDialog.getWindow().setGravity(Gravity.BOTTOM);
-        bottomDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
-        bottomDialog.show();
-
+        //改变gps格式
         GPS gps = new GPS(mlatitude,mlongitude);
         GPS upgps = bd09_To_Gps84(gps.getWgLat(),gps.getWgLon());
         gpslatitude = upgps.getWgLat();
         gpslongitude = upgps.getWgLon();
 
-        ok.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                //上传到服务器同时更新
-                if(addaction==0){
-                    //添加灯的语句
-                    upload.setName(6);
-                    name = NAME.getText().toString();
-                    luid = UID.getText().toString();
+        //灯具上传和控制器上传分别不同界面
+        if(addaction==0) {
+            View contentView = LayoutInflater.from(getActivity()).inflate(R.layout.activity_commit, null);
+            bottomDialog.setContentView(contentView);
+
+            NAME = (EditText) contentView.findViewById(R.id.Text);
+            UID = (EditText) contentView.findViewById(R.id.Text2);
+            GPS_1 = (EditText) contentView.findViewById(R.id.Text3);
+            GPS_2 = (EditText) contentView.findViewById(R.id.Text4);
+            ok = (Button) contentView.findViewById(R.id.okButton);
+            cancel = (Button) contentView.findViewById(R.id.cancelButton);
+
+
+            LinearLayout container = (LinearLayout) contentView.findViewById(R.id.val_list);
+            //LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT,1);
+            LinearLayout name_container = (LinearLayout) contentView.findViewById(R.id.name_list);
+            final TextView lamp_model = new TextView(getActivity());
+            LinearLayout.LayoutParams lampParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT,1);
+            lampParams.gravity = Gravity.END;
+            TextView id = (TextView) contentView.findViewById(R.id.uid);
+            lamp_model.setText("Model:");
+            lamp_model.setGravity(Gravity.CENTER);
+            lamp_model.setTextSize(16);
+            lamp_model.setLayoutParams(lampParams);
+            name_container.addView(lamp_model);
+            id.setText("Luid");
+
+            //增加显示cuid，灯具型号（一个下拉菜单）（扫描获得）
+            final Spinner list_lamp = new Spinner(getActivity());
+            List<String> alllamp = new ArrayList<String>();
+            for (int i = 0; i < LampListData.size(); i++) {
+                alllamp.add(LampListData.get(i).getModel());
+            }
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item,alllamp);
+            list_lamp.setAdapter(adapter);
+            LinearLayout.LayoutParams lampParams1 = new LinearLayout.LayoutParams(DensityUtil.dp2px(getActivity(),210),LinearLayout.LayoutParams.WRAP_CONTENT,1);
+            lampParams1.gravity = Gravity.CENTER;
+            list_lamp.setLayoutParams(lampParams1);
+            container.addView(list_lamp);
+            list_lamp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view,
+                                           int position, long id) {
+
+                    //拿到被选择项的值
+                    String lamp_model_name = (String) list_lamp.getSelectedItem();
+                    //把该值传给 TextView
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    // TODO Auto-generated method stub
 
                 }
-                else {
-                    //添加集中器的语句
-                    upload.setName(6);
-                    name = NAME.getText().toString();
-                    cuid = UID.getText().toString();
+            });
+
+            //currentLocation();
+
+            UID.setText(res);
+            GPS_1.setText(String.valueOf(mlatitude));
+            GPS_2.setText(String.valueOf(mlongitude));
+
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) contentView.getLayoutParams();
+            params.width = getResources().getDisplayMetrics().widthPixels - DensityUtil.dp2px(getActivity(), 16f);
+            params.bottomMargin = DensityUtil.dp2px(getActivity(), 8f);
+            contentView.setLayoutParams(params);
+            bottomDialog.getWindow().setGravity(Gravity.BOTTOM);
+            bottomDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
+            bottomDialog.show();
+
+            ok.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    //上传到服务器同时更新
+                    if(addaction==0){
+                        //添加灯的语句 FONDA_LCU12R单灯
+                        upload.setName(6);
+                        name = NAME.getText().toString();
+                        luid = UID.getText().toString();
+
+                    }
+                    else {
+                        //添加集中器的语句
+                        upload.setName(6);
+                        name = NAME.getText().toString();
+                        cuid = UID.getText().toString();
+                    }
+
+                    new Thread(upload).start();
+                    mapAnnotation(name,cuid,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
+                    bottomDialog.dismiss();
                 }
+            });
 
-                new Thread(upload).start();
-                mapAnnotation(name,cuid,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
-                bottomDialog.dismiss();
-            }
-        });
+            cancel.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    //cancel
+                    bottomDialog.dismiss();
+                }
+            });
+        }
 
-        cancel.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                //cancel
-                bottomDialog.dismiss();
-            }
-        });
+        if(addaction==1) {
+            View contentView = LayoutInflater.from(getActivity()).inflate(R.layout.activity_commit, null);
+            bottomDialog.setContentView(contentView);
+
+            NAME = (EditText) contentView.findViewById(R.id.Text);
+            UID = (EditText) contentView.findViewById(R.id.Text2);
+            GPS_1 = (EditText) contentView.findViewById(R.id.Text3);
+            GPS_2 = (EditText) contentView.findViewById(R.id.Text4);
+            ok = (Button) contentView.findViewById(R.id.okButton);
+            cancel = (Button) contentView.findViewById(R.id.cancelButton);
+            //currentLocation();
+
+            UID.setText(res);
+            GPS_1.setText(String.valueOf(mlatitude));
+            GPS_2.setText(String.valueOf(mlongitude));
+
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) contentView.getLayoutParams();
+            params.width = getResources().getDisplayMetrics().widthPixels - DensityUtil.dp2px(getActivity(), 16f);
+            params.bottomMargin = DensityUtil.dp2px(getActivity(), 8f);
+            contentView.setLayoutParams(params);
+            bottomDialog.getWindow().setGravity(Gravity.BOTTOM);
+            bottomDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
+            bottomDialog.show();
+
+            ok.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    //上传到服务器同时更新
+                    if(addaction==0){
+                        //添加灯的语句
+                        upload.setName(6);
+                        name = NAME.getText().toString();
+                        luid = UID.getText().toString();
+
+                    }
+                    else {
+                        //添加集中器的语句
+                        upload.setName(6);
+                        name = NAME.getText().toString();
+                        cuid = UID.getText().toString();
+                    }
+
+                    new Thread(upload).start();
+                    mapAnnotation(name,cuid,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
+                    bottomDialog.dismiss();
+                }
+            });
+
+            cancel.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    //cancel
+                    bottomDialog.dismiss();
+                }
+            });
+        }
+
+
+
+
+
+
+
+
+
+
 
     }
 

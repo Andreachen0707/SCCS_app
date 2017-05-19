@@ -5,54 +5,58 @@
     android:layout_height="wrap_content"
     android:background="@drawable/shape_dialog"
     android:orientation="vertical"
-    android:weightSum="1">
+    >
 
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:gravity="center">
+    android:gravity="center"
+    android:weightSum="1">
         <LinearLayout
+            android:id="@+id/name_list"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="left"
+            android:layout_gravity="start"
             android:layout_weight="0.2"
-            android:orientation="vertical"
-            android:weightSum="1">
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_weight="0.25"
+                android:layout_gravity="end"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:text="Name:"
                 android:textSize="@dimen/text_view" />
 
             <TextView
+                android:id="@+id/uid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_weight="0.25"
+                android:layout_gravity="end"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:text="UID:"
                 android:textSize="@dimen/text_view" />
 
             <TextView
+                android:id="@+id/lng"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:layout_weight="0.25"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:text="Longitude:"
                 android:textSize="@dimen/text_view" />
 
             <TextView
+                android:id="@+id/lat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:layout_weight="0.25"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:text="Latitude:"
                 android:textSize="@dimen/text_view" />
@@ -61,6 +65,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/val_list"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="right"
@@ -103,6 +108,9 @@
                 android:ems="10"
                 android:inputType="textPostalAddress" />
 
+
+
+
         </LinearLayout>
 </LinearLayout>
 
@@ -126,6 +134,7 @@
             android:background="@color/colorBlank"
             android:gravity="center"
             android:text="OK" />
+
 
         <Button
             android:id="@+id/cancelButton"

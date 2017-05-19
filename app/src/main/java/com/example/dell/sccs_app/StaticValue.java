@@ -29,7 +29,7 @@ public class StaticValue {
     public static String askConcentratorUrl = "http://121.40.34.92:7070/api/json?cmd=modelRtu&ctrl=page&version=1&lang=zh_CN&sid=";
     public static String askElectricUrl = "http://121.40.34.92:7070/api/json?cmd=modelMeter&ctrl=list&version=1&lang=zh_CN&sid=";
     public static String askLampUrl = "http://121.40.34.92:7070/api/json?cmd=modellamp&ctrl=page&version=1&lang=zh_CN&sid=";
-
+    public static String askLucUrl = "http://121.40.34.92:7070/api/json?cmd=modelLcu&ctrl=list&version=1&lang=zh_CN&sid=";
 
     public static String addContrallor= "http://121.40.34.92:7070/api/json?cmd=stations&ctrl=add&version=1&lang=zh_CN&sid=";
     public static String addLamp= "http://121.40.34.92:7070/api/json?cmd=lamps&ctrl=add&version=1&lang=zh_CN&sid=";
@@ -38,6 +38,7 @@ public class StaticValue {
     public static String addlamp = "http://121.40.34.92:7070/api/json?cmd=lamp&ctrl=latlng&version=1&lang=zh_CN&sid=";
     public static String addlamp2 = "http://121.40.34.92:7070/api/json?cmd=lamps&ctrl=add&version=1&lang=zh_CN&sid=";
     public static String stationquery = "http://121.40.34.92:7070/api/json?cmd=station&ctrl=get&version=1&lang=zh_CN&sid=";
+
 
     //所有控制柜的信息
     public static String stationquery_all = "http://121.40.34.92:7070/api/json?cmd=station-info&ctrl=list&version=1&lang=zh_CN&sid=";
