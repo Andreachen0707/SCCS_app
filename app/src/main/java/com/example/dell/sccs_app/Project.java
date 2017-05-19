@@ -539,7 +539,7 @@ public class Project extends AppCompatActivity
         @Override
         public void run() {
             int type = connectType;
-            String res = getProject(type,name,cuid,lat,lng);
+            String res = getProject(type,name,cuid,null,null,null,null,lat,lng);
             Message msg = new Message();
             Bundle data = new Bundle();
             data.putString("value", res);
@@ -605,7 +605,7 @@ public class Project extends AppCompatActivity
         }
         public void run()
         {
-            String res = getProject(type,name,cuid,lat,lng);
+            String res = getProject(type,name,cuid,null,null,null,null,lat,lng);
             Message msg = new Message();
             Bundle data = new Bundle();
             data.putString("value", res);

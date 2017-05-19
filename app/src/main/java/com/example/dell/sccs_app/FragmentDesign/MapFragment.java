@@ -67,6 +67,7 @@ import java.util.List;
 import static android.drm.DrmStore.DrmObjectType.CONTENT;
 import static com.example.dell.sccs_app.LoginProcess.getProject;
 import static com.example.dell.sccs_app.StaticValue.LampListData;
+import static com.example.dell.sccs_app.StaticValue.LcuData;
 import static com.example.dell.sccs_app.StaticValue.StationData;
 import static com.example.dell.sccs_app.StaticValue.addaction;
 import static com.example.dell.sccs_app.Util.GPS_convert.bd09_To_Gps84;
@@ -96,6 +97,9 @@ public class MapFragment extends Fragment {
     private float zoomLevel;
     private MyLocationListener mLocationListener;
     private boolean isFirstLocation = true;
+    private BitmapDescriptor bitmap;
+    private List<Marker> markerlist;
+    private int markerindex;
 
     private com.getbase.floatingactionbutton.FloatingActionButton scan;
     private com.getbase.floatingactionbutton.FloatingActionButton input;
@@ -110,8 +114,15 @@ public class MapFragment extends Fragment {
     private MyUpdate upload = new MyUpdate();
     private String name;
     private String cuid;
+    private String ssid;
     private String luid;
-    private String lmodel;
+    private String lmodel; //灯具型号 多少瓦的那个
+    private String lmodelid;
+    private String lcumodel; //单灯控制器型号，可以控制多少灯那个
+    private String lcumodelid;
+    private String cuid_now;//当前被点击的控制器的cuid
+    private String ssid_now;//当前被点击的控制器的ssid
+
 
     private Project.WebClient testClient;
 
@@ -167,6 +178,8 @@ public class MapFragment extends Fragment {
     }
 
     private void initMap() {
+        markerindex = 0;
+        markerlist = new ArrayList<Marker>();
         //获取地图控件引用
         mMapView = (MapView) mView.findViewById(R.id.baidu_map);
         // 不显示缩放比例尺
@@ -184,6 +197,14 @@ public class MapFragment extends Fragment {
         mBaidumap.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
             @Override
             public void onMapStatusChangeStart(MapStatus arg0) {
+                mBaidumap.clear();
+                for(int i = 0;i<markerlist.size();i++){
+                    MarkerOptions options = new MarkerOptions()
+                            .position(markerlist.get(i).getPosition())
+                            .icon(markerlist.get(i).getIcon());
+                    Marker marker = (Marker) mBaidumap.addOverlay(options);
+                    marker.setExtraInfo(markerlist.get(i).getExtraInfo());
+                }
             }
 
             @Override
@@ -220,6 +241,7 @@ public class MapFragment extends Fragment {
     {
         public void run()
         {
+            //初始化在地图上标记
             if(StationData.size()!=0) {
                 for(int t = 0;t<StationData.size();t++) {
                     double slatitude = StationData.get(t).getLat();
@@ -234,7 +256,7 @@ public class MapFragment extends Fragment {
                     slatitude = desLatLng.latitude;
                     slongitude = desLatLng.longitude;
 
-                    mapAnnotation(StationData.get(t).getName(),StationData.get(t).getCuid(),slatitude,slongitude);
+                    mapAnnotation(StationData.get(t).getName(),StationData.get(t).getCuid(),StationData.get(t).getSid(),null,1,slatitude,slongitude);
                 }
             }
             else
@@ -317,20 +339,28 @@ public class MapFragment extends Fragment {
             ok = (Button) contentView.findViewById(R.id.okButton);
             cancel = (Button) contentView.findViewById(R.id.cancelButton);
 
+            TextView id = (TextView) contentView.findViewById(R.id.uid);
+            id.setText("Luid");
 
             LinearLayout container = (LinearLayout) contentView.findViewById(R.id.val_list);
             //LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT,1);
             LinearLayout name_container = (LinearLayout) contentView.findViewById(R.id.name_list);
-            final TextView lamp_model = new TextView(getActivity());
+            TextView lamp_model = new TextView(getActivity());
+            TextView lcu_model = new TextView(getActivity());
             LinearLayout.LayoutParams lampParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT,1);
             lampParams.gravity = Gravity.END;
-            TextView id = (TextView) contentView.findViewById(R.id.uid);
+
             lamp_model.setText("Model:");
             lamp_model.setGravity(Gravity.CENTER);
             lamp_model.setTextSize(16);
             lamp_model.setLayoutParams(lampParams);
+            lcu_model.setText("Lcu:");
+            lcu_model.setGravity(Gravity.CENTER);
+            lcu_model.setTextSize(16);
+            lcu_model.setLayoutParams(lampParams);
             name_container.addView(lamp_model);
-            id.setText("Luid");
+            name_container.addView(lcu_model);
+
 
             //增加显示cuid，灯具型号（一个下拉菜单）（扫描获得）
             final Spinner list_lamp = new Spinner(getActivity());
@@ -338,8 +368,8 @@ public class MapFragment extends Fragment {
             for (int i = 0; i < LampListData.size(); i++) {
                 alllamp.add(LampListData.get(i).getModel());
             }
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item,alllamp);
-            list_lamp.setAdapter(adapter);
+            ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item,alllamp);
+            list_lamp.setAdapter(adapter1);
             LinearLayout.LayoutParams lampParams1 = new LinearLayout.LayoutParams(DensityUtil.dp2px(getActivity(),210),LinearLayout.LayoutParams.WRAP_CONTENT,1);
             lampParams1.gravity = Gravity.CENTER;
             list_lamp.setLayoutParams(lampParams1);
@@ -347,11 +377,11 @@ public class MapFragment extends Fragment {
             list_lamp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
                 @Override
-                public void onItemSelected(AdapterView<?> parent, View view,
-                                           int position, long id) {
-
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     //拿到被选择项的值,传给上传的指令
                     lmodel = (String) list_lamp.getSelectedItem();
+                    lmodelid = LampListData.get(position).getModelId();
+                    Log.i("lamp model",lmodelid+lmodel);
                 }
 
                 @Override
@@ -359,6 +389,33 @@ public class MapFragment extends Fragment {
                     // TODO Auto-generated method stub
                 }
             });
+
+            //显示单灯控制器型号
+            final Spinner list_lcu = new Spinner(getActivity());
+            List<String> alllcu = new ArrayList<String>();
+            for (int i = 0; i < LcuData.size(); i++) {
+                alllcu.add(LcuData.get(i).getModel());
+            }
+            ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item,alllcu);
+            list_lcu.setAdapter(adapter2);
+            lampParams1.gravity = Gravity.CENTER;
+            list_lcu.setLayoutParams(lampParams1);
+            container.addView(list_lcu);
+            list_lcu.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    //拿到被选择项的值,传给上传的指令
+                    lcumodel = (String) list_lcu.getSelectedItem();
+                    lcumodelid = LcuData.get(position).getModelId();
+                    Log.i("lcu model",lcumodelid+lcumodel);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    // TODO Auto-generated method stub
+                }
+            });
+
 
             //currentLocation();
 
@@ -377,23 +434,13 @@ public class MapFragment extends Fragment {
             ok.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    //上传到服务器同时更新
-                    if(addaction==0){
-                        //添加灯的语句 FONDA_LCU12R单灯
-                        upload.setName(6);
+                    //添加灯的指令
+                        upload.setName(8);
                         name = NAME.getText().toString();
                         luid = UID.getText().toString();
 
-                    }
-                    else {
-                        //添加集中器的语句
-                        upload.setName(7);
-                        name = NAME.getText().toString();
-                        cuid = UID.getText().toString();
-                    }
-
                     new Thread(upload).start();
-                    mapAnnotation(name,cuid,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
+                    mapAnnotation(name,cuid_now,ssid_now,luid,0,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
                     bottomDialog.dismiss();
                 }
             });
@@ -450,7 +497,7 @@ public class MapFragment extends Fragment {
                     }
 
                     new Thread(upload).start();
-                    mapAnnotation(name,cuid,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
+                    mapAnnotation(name,cuid,null,null,1,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
                     bottomDialog.dismiss();
                 }
             });
@@ -463,16 +510,6 @@ public class MapFragment extends Fragment {
                 }
             });
         }
-
-
-
-
-
-
-
-
-
-
 
     }
 
@@ -542,24 +579,35 @@ public class MapFragment extends Fragment {
 
     }
 
-    public void mapAnnotation(String name,String cuid,double lat,double lng)
+    public void mapAnnotation(String name,String cuid,String ssid,String luid,int type,double lat,double lng)
     {
         Marker marker = null;
         //定义Maker坐标点
         LatLng point = new LatLng(lat, lng);
         //构建Marker图标
-        BitmapDescriptor bitmap = BitmapDescriptorFactory
-                .fromResource(R.drawable.ic_icon_controler_gray);
+        if(type == 1) {
+            bitmap = BitmapDescriptorFactory
+                    .fromResource(R.drawable.ic_icon_controler_gray);
+        }
+        if(type ==0){
+            bitmap = BitmapDescriptorFactory
+                    .fromResource(R.drawable.ic_button_input);
+        }
         //构建MarkerOption，用于在地图上添加Marker
         OverlayOptions option = new MarkerOptions()
                 .position(point)
                 .icon(bitmap);
         Bundle bundle = new Bundle();
+        bundle.putSerializable("type",type);
         bundle.putSerializable("info", name);
         bundle.putSerializable("cuid",cuid);
+        bundle.putSerializable("luid",luid);
+        bundle.putSerializable("ssid",ssid);
         //在地图上添加Marker，并显示
         marker = (Marker) mBaidumap.addOverlay(option);
         marker.setExtraInfo(bundle);
+        markerlist.add(markerindex,marker);
+        markerindex = markerindex+1;
     }
 
     BaiduMap.OnMarkerClickListener markerClick = new BaiduMap.OnMarkerClickListener() {
@@ -569,9 +617,15 @@ public class MapFragment extends Fragment {
          */
         public boolean onMarkerClick(Marker marker){
             InfoWindow mInfoWindow;
+            BitmapDescriptor bitmap_onclick = BitmapDescriptorFactory
+                    .fromResource(R.drawable.ic_menu_camera);
+            marker.setIcon(bitmap_onclick);
 
             Bundle res = marker.getExtraInfo();
             String a = res.getString("cuid");
+            cuid_now = a;
+            ssid_now = res.getString("ssid");
+            a = ssid_now;
             TextView location = new TextView(getActivity().getApplicationContext());
             location.setPadding(30, 20, 30, 50);
             location.setText(a);
@@ -657,7 +711,7 @@ public class MapFragment extends Fragment {
         }
         public void run()
         {
-            String res = getProject(type,name,cuid,gpslatitude,gpslongitude);
+            String res = getProject(type,name,cuid_now,ssid_now,luid,lmodelid,lcumodelid,gpslatitude,gpslongitude);
             Message msg = new Message();
             Bundle data = new Bundle();
             data.putString("value", res);

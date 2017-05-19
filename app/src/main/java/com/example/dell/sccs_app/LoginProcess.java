@@ -329,7 +329,7 @@ public class LoginProcess extends AppCompatActivity {
         return axWebSID;
     }
 
-    public static String getProject(int con_type,String name,String cuid,double lat,double lng) {
+    public static String getProject(int con_type,String name,String cuid,String ssid,String luid,String lmodelid,String lcumodelid,double lat,double lng) {
         String body = "";
         String projectId = "";
         String link = "";
@@ -379,7 +379,9 @@ public class LoginProcess extends AppCompatActivity {
 
             case 8:
                 link = addLamp;
-                body = "{\"wheres\":[{\"k\":\"stationId\",\"o\":\"=\",\"v\":\"a5cff7fddf19414289ea8d6959e1021b\"}],\"orders\":[]}";
+                projectId = projectData.get(projectTemp).getId();
+                body = "{\"luid\":\""+luid+"\",\"lampmodel\":\""+lmodelid+"\",\"pid\":\""+projectId+"\",\"sid\":\""+ssid+"\",\"name\":\""+name+"\",\"channel\":1,\"lcumodel\":\""+lcumodelid+"\",\"kmId\":null,\"lat\":\""+lat+",\"lng\":\""+lng+",\"dirId\":\""+ssid+"}";
+                Log.i("type 8 body",body);
                 break;
             case 0:
                 link = logout;
@@ -496,6 +498,7 @@ public class LoginProcess extends AppCompatActivity {
             for(JsonElement user : jsonArray) {
                 StationBean station=  gson.fromJson(user,StationBean.class);
                 StationData.add(i,station);
+                Log.i("station id",i+StationData.get(i).getSid());
                 i++;
             }
         }
