@@ -327,27 +327,33 @@ public class MapFragment extends Fragment {
         gpslatitude = upgps.getWgLat();
         gpslongitude = upgps.getWgLon();
 
+        //静态定义
+        View contentView = LayoutInflater.from(getActivity()).inflate(R.layout.activity_commit, null);
+        bottomDialog.setContentView(contentView);
+        NAME = (EditText) contentView.findViewById(R.id.Text);
+        UID = (EditText) contentView.findViewById(R.id.Text2);
+        GPS_1 = (EditText) contentView.findViewById(R.id.Text3);
+        GPS_2 = (EditText) contentView.findViewById(R.id.Text4);
+        ok = (Button) contentView.findViewById(R.id.okButton);
+        cancel = (Button) contentView.findViewById(R.id.cancelButton);
+
+        UID.setText(res);
+        GPS_1.setText(String.valueOf(mlatitude));
+        GPS_2.setText(String.valueOf(mlongitude));
+
         //灯具上传和控制器上传分别不同界面
         if(addaction==0) {
-            View contentView = LayoutInflater.from(getActivity()).inflate(R.layout.activity_commit, null);
-            bottomDialog.setContentView(contentView);
-
-            NAME = (EditText) contentView.findViewById(R.id.Text);
-            UID = (EditText) contentView.findViewById(R.id.Text2);
-            GPS_1 = (EditText) contentView.findViewById(R.id.Text3);
-            GPS_2 = (EditText) contentView.findViewById(R.id.Text4);
-            ok = (Button) contentView.findViewById(R.id.okButton);
-            cancel = (Button) contentView.findViewById(R.id.cancelButton);
-
             TextView id = (TextView) contentView.findViewById(R.id.uid);
-            id.setText("Luid");
+            id.setText("Luid:");
 
             LinearLayout container = (LinearLayout) contentView.findViewById(R.id.val_list);
             //LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT,1);
             LinearLayout name_container = (LinearLayout) contentView.findViewById(R.id.name_list);
             TextView lamp_model = new TextView(getActivity());
             TextView lcu_model = new TextView(getActivity());
+            TextView cuid = new TextView(getActivity());
             LinearLayout.LayoutParams lampParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT,1);
+            LinearLayout.LayoutParams lampParams2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT,1);
             lampParams.gravity = Gravity.END;
 
             lamp_model.setText("Model:");
@@ -358,8 +364,21 @@ public class MapFragment extends Fragment {
             lcu_model.setGravity(Gravity.CENTER);
             lcu_model.setTextSize(16);
             lcu_model.setLayoutParams(lampParams);
+            cuid.setText("cuid:");
+            cuid.setGravity(Gravity.CENTER);
+            cuid.setTextSize(16);
+            cuid.setLayoutParams(lampParams);
+            name_container.addView(cuid);
             name_container.addView(lamp_model);
             name_container.addView(lcu_model);
+
+            EditText cuidvalue = new EditText(getActivity());
+            lampParams2.gravity = Gravity.CENTER;
+            cuidvalue.setEms(10);
+            cuidvalue.setLayoutParams(lampParams2);
+            cuidvalue.setText(cuid_now);
+            cuidvalue.setEnabled(false);
+            container.addView(cuidvalue);
 
 
             //增加显示cuid，灯具型号（一个下拉菜单）（扫描获得）
@@ -375,7 +394,6 @@ public class MapFragment extends Fragment {
             list_lamp.setLayoutParams(lampParams1);
             container.addView(list_lamp);
             list_lamp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     //拿到被选择项的值,传给上传的指令
@@ -417,20 +435,6 @@ public class MapFragment extends Fragment {
             });
 
 
-            //currentLocation();
-
-            UID.setText(res);
-            GPS_1.setText(String.valueOf(mlatitude));
-            GPS_2.setText(String.valueOf(mlongitude));
-
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) contentView.getLayoutParams();
-            params.width = getResources().getDisplayMetrics().widthPixels - DensityUtil.dp2px(getActivity(), 16f);
-            params.bottomMargin = DensityUtil.dp2px(getActivity(), 8f);
-            contentView.setLayoutParams(params);
-            bottomDialog.getWindow().setGravity(Gravity.BOTTOM);
-            bottomDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
-            bottomDialog.show();
-
             ok.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
@@ -455,46 +459,14 @@ public class MapFragment extends Fragment {
         }
 
         if(addaction==1) {
-            View contentView = LayoutInflater.from(getActivity()).inflate(R.layout.activity_commit, null);
-            bottomDialog.setContentView(contentView);
-
-            NAME = (EditText) contentView.findViewById(R.id.Text);
-            UID = (EditText) contentView.findViewById(R.id.Text2);
-            GPS_1 = (EditText) contentView.findViewById(R.id.Text3);
-            GPS_2 = (EditText) contentView.findViewById(R.id.Text4);
-            ok = (Button) contentView.findViewById(R.id.okButton);
-            cancel = (Button) contentView.findViewById(R.id.cancelButton);
-            //currentLocation();
-
-            UID.setText(res);
-            GPS_1.setText(String.valueOf(mlatitude));
-            GPS_2.setText(String.valueOf(mlongitude));
-
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) contentView.getLayoutParams();
-            params.width = getResources().getDisplayMetrics().widthPixels - DensityUtil.dp2px(getActivity(), 16f);
-            params.bottomMargin = DensityUtil.dp2px(getActivity(), 8f);
-            contentView.setLayoutParams(params);
-            bottomDialog.getWindow().setGravity(Gravity.BOTTOM);
-            bottomDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
-            bottomDialog.show();
-
             ok.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
                     //上传到服务器同时更新
-                    if(addaction==0){
-                        //添加灯的语句
-                        upload.setName(7);
-                        name = NAME.getText().toString();
-                        luid = UID.getText().toString();
-
-                    }
-                    else {
-                        //添加集中器的语句
-                        upload.setName(6);
-                        name = NAME.getText().toString();
-                        cuid = UID.getText().toString();
-                    }
+                    //添加集中器的语句
+                    upload.setName(7);
+                    name = NAME.getText().toString();
+                    cuid = UID.getText().toString();
 
                     new Thread(upload).start();
                     mapAnnotation(name,cuid,null,null,1,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
@@ -510,6 +482,14 @@ public class MapFragment extends Fragment {
                 }
             });
         }
+
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) contentView.getLayoutParams();
+        params.width = getResources().getDisplayMetrics().widthPixels - DensityUtil.dp2px(getActivity(), 16f);
+        params.bottomMargin = DensityUtil.dp2px(getActivity(), 8f);
+        contentView.setLayoutParams(params);
+        bottomDialog.getWindow().setGravity(Gravity.BOTTOM);
+        bottomDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
+        bottomDialog.show();
 
     }
 
@@ -591,7 +571,7 @@ public class MapFragment extends Fragment {
         }
         if(type ==0){
             bitmap = BitmapDescriptorFactory
-                    .fromResource(R.drawable.ic_button_input);
+                    .fromResource(R.drawable.icons_lamp_on);
         }
         //构建MarkerOption，用于在地图上添加Marker
         OverlayOptions option = new MarkerOptions()
@@ -618,7 +598,7 @@ public class MapFragment extends Fragment {
         public boolean onMarkerClick(Marker marker){
             InfoWindow mInfoWindow;
             BitmapDescriptor bitmap_onclick = BitmapDescriptorFactory
-                    .fromResource(R.drawable.ic_menu_camera);
+                    .fromResource(R.drawable.icons_controller_onselected_small);
             marker.setIcon(bitmap_onclick);
 
             Bundle res = marker.getExtraInfo();

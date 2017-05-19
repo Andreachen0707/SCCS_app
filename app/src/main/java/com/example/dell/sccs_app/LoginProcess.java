@@ -380,7 +380,7 @@ public class LoginProcess extends AppCompatActivity {
             case 8:
                 link = addLamp;
                 projectId = projectData.get(projectTemp).getId();
-                body = "{\"luid\":\""+luid+"\",\"lampmodel\":\""+lmodelid+"\",\"pid\":\""+projectId+"\",\"sid\":\""+ssid+"\",\"name\":\""+name+"\",\"channel\":1,\"lcumodel\":\""+lcumodelid+"\",\"kmId\":null,\"lat\":\""+lat+",\"lng\":\""+lng+",\"dirId\":\""+ssid+"}";
+                body = "{\"luid\":\""+luid+"\",\"lampmodel\":\""+lmodelid+"\",\"pid\":\""+projectId+"\",\"sid\":\""+ssid+"\",\"cuid\":\"" + cuid + "\",\"ctype\":1,\"name\":\""+name+"\",\"channel\":1,\"lcumodel\":\""+lcumodelid+"\",\"kmId\":null,\"lat\":"+lat+",\"lng\":"+lng+",\"dirId\":\""+ssid+"\"}";
                 Log.i("type 8 body",body);
                 break;
             case 0:
