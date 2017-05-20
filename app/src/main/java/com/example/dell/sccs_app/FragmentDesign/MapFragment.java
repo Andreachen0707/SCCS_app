@@ -83,8 +83,12 @@ public class MapFragment extends Fragment {
 
     private com.getbase.floatingactionbutton.FloatingActionButton mAddLamp;
     private com.getbase.floatingactionbutton.FloatingActionButton mAddControllor;
+    private com.getbase.floatingactionbutton.FloatingActionButton refresh;
     private com.getbase.floatingactionbutton.FloatingActionButton mLampon;
     private com.getbase.floatingactionbutton.FloatingActionsMenu mAddlist;
+
+    private com.getbase.floatingactionbutton.FloatingActionButton scan;
+    private com.getbase.floatingactionbutton.FloatingActionButton input;
 
     private double mlongitude;
     private double mlatitude;
@@ -102,10 +106,10 @@ public class MapFragment extends Fragment {
     private boolean isFirstLocation = true;
     private BitmapDescriptor bitmap;
     private List<Marker> markerlist;
+    private List<Marker> lampmarkerlist;
     private int markerindex;
+    private int lampindex;
 
-    private com.getbase.floatingactionbutton.FloatingActionButton scan;
-    private com.getbase.floatingactionbutton.FloatingActionButton input;
 
     private EditText NAME;
     private EditText UID;
@@ -115,6 +119,8 @@ public class MapFragment extends Fragment {
     private Button cancel;
 
     private MyUpdate upload = new MyUpdate();
+    private MyUpdate mrefresh = new MyUpdate();
+
     private String name;
     private String cuid;
     private String ssid;
@@ -138,6 +144,7 @@ public class MapFragment extends Fragment {
         mAddlist = (com.getbase.floatingactionbutton.FloatingActionsMenu) mView.findViewById(R.id.addItem);
         mAddLamp = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemLamp);
         mAddControllor = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemControl);
+        refresh = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.refresh);
 
 
         initMap();
@@ -149,7 +156,7 @@ public class MapFragment extends Fragment {
 
         //调用client发送是可以的
         testClient = ((Project)getActivity()).getmClient();
-        testClient.senddata("login", "heart-beat","1","zh_CN","" , "0" , "");
+        //testClient.senddata("login", "heart-beat","1","zh_CN","" , "0" , "");
 
 
         //添加新集中器时标记的方式
@@ -172,6 +179,20 @@ public class MapFragment extends Fragment {
                 // Fragment_Project.notify();
             }
         });
+
+        refresh.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                for(int i=0;i<markerlist.size();i++){
+                    markerlist.get(i).remove();
+                }
+                Log.i("length test",String.valueOf(markerlist.size()));
+                mrefresh.setParam(5,null,null,null,null,null,null,0,0);
+                new Thread(mrefresh).start();
+                handler.postDelayed(new maphandler(),1000);
+            }
+        });
+
         return mView;
     }
 
@@ -183,7 +204,9 @@ public class MapFragment extends Fragment {
 
     private void initMap() {
         markerindex = 0;
+        lampindex = 0;
         markerlist = new ArrayList<Marker>();
+        lampmarkerlist = new ArrayList<Marker>();
         //获取地图控件引用
         mMapView = (MapView) mView.findViewById(R.id.baidu_map);
         // 不显示缩放比例尺
@@ -201,9 +224,30 @@ public class MapFragment extends Fragment {
         mBaidumap.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
             @Override
             public void onMapStatusChangeStart(MapStatus arg0) {
-                mAddlist.removeButton(mLampon);
+                //mAddlist.removeButton(mLampon);
+                mAddControllor.setIcon(R.drawable.icons_controller_gray);
+                mAddLamp.setIcon(R.drawable.icons_pot);
+                //应该加一个初始化按钮的函数，恢复到初始状态
+                mAddLamp.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view){
+                        addaction = 0;
+                        Add_scan_show();
+                    }
+                });
+
+                mAddControllor.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view){
+                        addaction = 1;
+                        Add_scan_show();
+                        // Fragment_Project.notify();
+                    }
+                });
                 //mBaidumap.clear();
                 for(int i = 0;i<markerlist.size();i++){
+                    bitmap = BitmapDescriptorFactory
+                            .fromResource(R.drawable.icons_pin_controller);
                     markerlist.get(i).setIcon(bitmap);
                 }
             }
@@ -440,12 +484,12 @@ public class MapFragment extends Fragment {
                 @Override
                 public void onClick(View v){
                     //添加灯的指令
-                        upload.setName(8);
-                        name = NAME.getText().toString();
-                        luid = UID.getText().toString();
+                    name = NAME.getText().toString();
+                    luid = UID.getText().toString();
+                    upload.setParam(8,name,cuid_now,ssid_now,luid,lmodelid,lcumodelid,gpslatitude,gpslongitude);
 
                     new Thread(upload).start();
-                    mapAnnotation(name,cuid_now,ssid_now,luid,0,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
+                    mapAnnotation(name,cuid_now,null,luid,0,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
                     bottomDialog.dismiss();
                 }
             });
@@ -465,9 +509,9 @@ public class MapFragment extends Fragment {
                 public void onClick(View v){
                     //上传到服务器同时更新
                     //添加集中器的语句
-                    upload.setName(7);
                     name = NAME.getText().toString();
                     cuid = UID.getText().toString();
+                    upload.setParam(7,name,cuid,name,null,null,null,gpslatitude,gpslongitude);
 
                     new Thread(upload).start();
                     mapAnnotation(name,cuid,null,null,1,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
@@ -587,8 +631,15 @@ public class MapFragment extends Fragment {
         //在地图上添加Marker，并显示
         marker = (Marker) mBaidumap.addOverlay(option);
         marker.setExtraInfo(bundle);
-        markerlist.add(markerindex,marker);
-        markerindex = markerindex+1;
+        if(type == 1) {
+            markerlist.add(markerindex, marker);
+            markerindex = markerindex+1;
+        }
+        else{
+            lampmarkerlist.add(lampindex,marker);
+            lampindex = lampindex+1;
+        }
+
     }
 
     BaiduMap.OnMarkerClickListener markerClick = new BaiduMap.OnMarkerClickListener() {
@@ -606,16 +657,18 @@ public class MapFragment extends Fragment {
             String a = res.getString("cuid");
             cuid_now = a;
             ssid_now = res.getString("ssid");
-            a = ssid_now;
+            Log.i("ssid now",ssid_now);
 
             //点击后动态改变浮动按钮的功能
             mLampon= new com.getbase.floatingactionbutton.FloatingActionButton(getActivity());
-            mAddLamp.setIcon(R.drawable.icon_control_on);
+            //点击按钮以后把按钮显示改掉
+            mAddLamp.setIcon(R.drawable.icon_lamp_on);
+            mAddControllor.setIcon(R.drawable.icon_lamp_off);
             mAddLamp.setTitle("Turn on");
             mLampon.setSize(com.getbase.floatingactionbutton.FloatingActionButton.SIZE_MINI);
-            mAddlist.addButton(mLampon);
+            //mAddlist.addButton(mLampon);
             //mAddControllor.setIcon(R.drawable.icons_controller_white);
-            mLampon.setOnClickListener(new View.OnClickListener(){
+            mAddLamp.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view){
                    testClient.senddata("ctrl-km","turn-on","1","zh_CN",""+cuid_now+"","1","{\"sid\":\""+ssid_now+"\",\"kms\":null}");
@@ -703,13 +756,29 @@ public class MapFragment extends Fragment {
     private class MyUpdate implements Runnable
     {
         private int type;
-        public void setName(int name)
+        private String name;
+        private String cuid;
+        private String ssid;
+        private String luid;
+        private String lmodelid;
+        private String lcumodelid;
+        private double lat;
+        private double lng;
+        public void setParam(int type,String name,String cuid,String ssid,String luid,String lmodelid,String lcumodelid,double lat,double lng)
         {
-            this.type = name;
+            this.type = type;
+            this.name = name;
+            this.cuid = cuid;
+            this.ssid = ssid;
+            this.luid = luid;
+            this.lmodelid = lmodelid;
+            this.lcumodelid = lcumodelid;
+            this.lat = lat;
+            this.lng = lng;
         }
         public void run()
         {
-            String res = getProject(type,name,cuid_now,ssid_now,luid,lmodelid,lcumodelid,gpslatitude,gpslongitude);
+            String res = getProject(type,name,cuid,ssid,luid,lmodelid,lcumodelid,lat,lng);
             Message msg = new Message();
             Bundle data = new Bundle();
             data.putString("value", res);

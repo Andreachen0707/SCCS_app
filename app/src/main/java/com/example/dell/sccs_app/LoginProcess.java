@@ -60,6 +60,7 @@ import static com.example.dell.sccs_app.StaticValue.connectState;
 import static com.example.dell.sccs_app.StaticValue.deviceListData;
 import static com.example.dell.sccs_app.StaticValue.infostate_1;
 import static com.example.dell.sccs_app.StaticValue.infostate_2;
+import static com.example.dell.sccs_app.StaticValue.lampquery;
 import static com.example.dell.sccs_app.StaticValue.logout;
 import static com.example.dell.sccs_app.StaticValue.projectData;
 import static com.example.dell.sccs_app.StaticValue.projectTemp;
@@ -383,6 +384,13 @@ public class LoginProcess extends AppCompatActivity {
                 body = "{\"luid\":\""+luid+"\",\"lampmodel\":\""+lmodelid+"\",\"pid\":\""+projectId+"\",\"sid\":\""+ssid+"\",\"cuid\":\"" + cuid + "\",\"ctype\":1,\"name\":\""+name+"\",\"channel\":1,\"lcumodel\":\""+lcumodelid+"\",\"kmId\":null,\"lat\":"+lat+",\"lng\":"+lng+",\"dirId\":\""+ssid+"\"}";
                 Log.i("type 8 body",body);
                 break;
+
+            case 9:
+                projectId = projectData.get(projectTemp).getId();
+                link = lampquery;
+                body = "\""+ssid+"\"";
+                break;
+
             case 0:
                 link = logout;
                 break;
