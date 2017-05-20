@@ -58,6 +58,7 @@ import com.example.dell.sccs_app.R;
 import com.example.dell.sccs_app.Util.DensityUtil;
 import com.example.dell.sccs_app.Util.GPS;
 import com.example.dell.sccs_app.Util.GPS_convert;
+import com.example.dell.sccs_app.Widgets.FloatingActionButton;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.common.StringUtils;
 
@@ -82,6 +83,8 @@ public class MapFragment extends Fragment {
 
     private com.getbase.floatingactionbutton.FloatingActionButton mAddLamp;
     private com.getbase.floatingactionbutton.FloatingActionButton mAddControllor;
+    private com.getbase.floatingactionbutton.FloatingActionButton mLampon;
+    private com.getbase.floatingactionbutton.FloatingActionsMenu mAddlist;
 
     private double mlongitude;
     private double mlatitude;
@@ -132,6 +135,7 @@ public class MapFragment extends Fragment {
         SDKInitializer.initialize(getActivity().getApplicationContext());
         mView = inflater.inflate(R.layout.map_fragment, container, false);
 
+        mAddlist = (com.getbase.floatingactionbutton.FloatingActionsMenu) mView.findViewById(R.id.addItem);
         mAddLamp = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemLamp);
         mAddControllor = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemControl);
 
@@ -197,13 +201,10 @@ public class MapFragment extends Fragment {
         mBaidumap.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
             @Override
             public void onMapStatusChangeStart(MapStatus arg0) {
-                mBaidumap.clear();
+                mAddlist.removeButton(mLampon);
+                //mBaidumap.clear();
                 for(int i = 0;i<markerlist.size();i++){
-                    MarkerOptions options = new MarkerOptions()
-                            .position(markerlist.get(i).getPosition())
-                            .icon(markerlist.get(i).getIcon());
-                    Marker marker = (Marker) mBaidumap.addOverlay(options);
-                    marker.setExtraInfo(markerlist.get(i).getExtraInfo());
+                    markerlist.get(i).setIcon(bitmap);
                 }
             }
 
@@ -567,11 +568,11 @@ public class MapFragment extends Fragment {
         //构建Marker图标
         if(type == 1) {
             bitmap = BitmapDescriptorFactory
-                    .fromResource(R.drawable.ic_icon_controler_gray);
+                    .fromResource(R.drawable.icons_pin_controller);
         }
         if(type ==0){
             bitmap = BitmapDescriptorFactory
-                    .fromResource(R.drawable.icons_lamp_on);
+                    .fromResource(R.drawable.icons_pin_lamp);
         }
         //构建MarkerOption，用于在地图上添加Marker
         OverlayOptions option = new MarkerOptions()
@@ -606,6 +607,23 @@ public class MapFragment extends Fragment {
             cuid_now = a;
             ssid_now = res.getString("ssid");
             a = ssid_now;
+
+            //点击后动态改变浮动按钮的功能
+            mLampon= new com.getbase.floatingactionbutton.FloatingActionButton(getActivity());
+            mAddLamp.setIcon(R.drawable.icon_control_on);
+            mAddLamp.setTitle("Turn on");
+            mLampon.setSize(com.getbase.floatingactionbutton.FloatingActionButton.SIZE_MINI);
+            mAddlist.addButton(mLampon);
+            //mAddControllor.setIcon(R.drawable.icons_controller_white);
+            mLampon.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view){
+                   testClient.senddata("ctrl-km","turn-on","1","zh_CN",""+cuid_now+"","1","{\"sid\":\""+ssid_now+"\",\"kms\":null}");
+                }
+            });
+
+
+
             TextView location = new TextView(getActivity().getApplicationContext());
             location.setPadding(30, 20, 30, 50);
             location.setText(a);
