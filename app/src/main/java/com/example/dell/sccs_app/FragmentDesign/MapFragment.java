@@ -131,6 +131,8 @@ public class MapFragment extends Fragment {
     private String lcumodelid;
     private String cuid_now;//当前被点击的控制器的cuid
     private String ssid_now;//当前被点击的控制器的ssid
+    private int numberoflamp;//默认灯具名字
+    private int numberofcontrol;//默认集中器名字
 
 
     private Project.WebClient testClient;
@@ -205,6 +207,8 @@ public class MapFragment extends Fragment {
     private void initMap() {
         markerindex = 0;
         lampindex = 0;
+        numberoflamp = 1;
+        numberofcontrol = 1;
         markerlist = new ArrayList<Marker>();
         lampmarkerlist = new ArrayList<Marker>();
         //获取地图控件引用
@@ -388,6 +392,7 @@ public class MapFragment extends Fragment {
 
         //灯具上传和控制器上传分别不同界面
         if(addaction==0) {
+            NAME.setText("Lamp"+String.valueOf(numberoflamp));
             TextView id = (TextView) contentView.findViewById(R.id.uid);
             id.setText("Luid:");
 
@@ -487,7 +492,7 @@ public class MapFragment extends Fragment {
                     name = NAME.getText().toString();
                     luid = UID.getText().toString();
                     upload.setParam(8,name,cuid_now,ssid_now,luid,lmodelid,lcumodelid,gpslatitude,gpslongitude);
-
+                    numberoflamp++;
                     new Thread(upload).start();
                     mapAnnotation(name,cuid_now,null,luid,0,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
                     bottomDialog.dismiss();
@@ -504,6 +509,7 @@ public class MapFragment extends Fragment {
         }
 
         if(addaction==1) {
+            NAME.setText("Controller"+String.valueOf(numberofcontrol));
             ok.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
@@ -512,7 +518,7 @@ public class MapFragment extends Fragment {
                     name = NAME.getText().toString();
                     cuid = UID.getText().toString();
                     upload.setParam(7,name,cuid,name,null,null,null,gpslatitude,gpslongitude);
-
+                    numberofcontrol++;
                     new Thread(upload).start();
                     mapAnnotation(name,cuid,null,null,1,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
                     bottomDialog.dismiss();

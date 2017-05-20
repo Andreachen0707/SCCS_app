@@ -5,6 +5,7 @@ import com.example.dell.sccs_app.Bean.DeviceListBean;
 import com.example.dell.sccs_app.Bean.ElectricListBean;
 import com.example.dell.sccs_app.Bean.LampListBean;
 import com.example.dell.sccs_app.Bean.LcuBean;
+import com.example.dell.sccs_app.Bean.Lcu_lampBean;
 import com.example.dell.sccs_app.Bean.ProjectBean;
 import com.example.dell.sccs_app.Bean.StationBean;
 
@@ -55,6 +56,7 @@ public class StaticValue {
     public static ArrayList<LampListBean> LampListData = new ArrayList<>();
     public static ArrayList<StationBean> StationData = new ArrayList<>();
     public static ArrayList<LcuBean> LcuData = new ArrayList<>();
+    public static ArrayList<Lcu_lampBean> Lcu_lampData = new ArrayList<>();
     public static int projectTemp = 0;
     public static int addaction = 0;
 }

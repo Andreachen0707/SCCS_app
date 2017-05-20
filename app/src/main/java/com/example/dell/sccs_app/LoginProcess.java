@@ -9,6 +9,7 @@ import com.example.dell.sccs_app.Bean.DeviceListBean;
 import com.example.dell.sccs_app.Bean.ElectricListBean;
 import com.example.dell.sccs_app.Bean.LampListBean;
 import com.example.dell.sccs_app.Bean.LcuBean;
+import com.example.dell.sccs_app.Bean.Lcu_lampBean;
 import com.example.dell.sccs_app.Bean.ProjectBean;
 import com.example.dell.sccs_app.Bean.StationBean;
 import com.example.dell.sccs_app.Util.Md5Util;
@@ -48,6 +49,7 @@ import java.util.Map;
 import static com.example.dell.sccs_app.StaticValue.ElectricListData;
 import static com.example.dell.sccs_app.StaticValue.LampListData;
 import static com.example.dell.sccs_app.StaticValue.LcuData;
+import static com.example.dell.sccs_app.StaticValue.Lcu_lampData;
 import static com.example.dell.sccs_app.StaticValue.StationData;
 import static com.example.dell.sccs_app.StaticValue.addContrallor;
 import static com.example.dell.sccs_app.StaticValue.addLamp;
@@ -516,6 +518,15 @@ public class LoginProcess extends AppCompatActivity {
             for(JsonElement user : jsonArray) {
                 LcuBean lcumodel=  gson.fromJson(user,LcuBean.class);
                 LcuData.add(i,lcumodel);
+                i++;
+            }
+        }
+        else if(type == 9){
+            Lcu_lampData.clear();
+            int i = 0;
+            for (JsonElement user : jsonArray){
+                Lcu_lampBean lcu_lamp = gson.fromJson(user,Lcu_lampBean.class);
+                Lcu_lampData.add(i,lcu_lamp);
                 i++;
             }
         }
