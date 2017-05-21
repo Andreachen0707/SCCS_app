@@ -789,6 +789,19 @@ public class MapFragment extends Fragment {
                     }
                 });
 
+                mLampoff.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        testClient.senddata("ctrl-km","turn-off","1","zh_CN",""+cuid_now+"","1","{\"sid\":\"" + ssid_now + "\",\"kms\":null}");
+                    }
+                });
+
+                mLampadjust.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //跳到改光度的界面
+                    }
+                });
                 mdelete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
