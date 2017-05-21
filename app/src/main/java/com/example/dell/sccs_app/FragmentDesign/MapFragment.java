@@ -3,6 +3,7 @@ package com.example.dell.sccs_app.FragmentDesign;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
@@ -14,6 +15,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -84,7 +86,9 @@ public class MapFragment extends Fragment {
     private com.getbase.floatingactionbutton.FloatingActionButton mAddLamp;
     private com.getbase.floatingactionbutton.FloatingActionButton mAddControllor;
     private com.getbase.floatingactionbutton.FloatingActionButton refresh;
-    private com.getbase.floatingactionbutton.FloatingActionButton mLampon;
+    private com.getbase.floatingactionbutton.FloatingActionButton mLampoff;
+    private com.getbase.floatingactionbutton.FloatingActionButton mLampadjust;
+    private com.getbase.floatingactionbutton.FloatingActionButton mdelete;
     private com.getbase.floatingactionbutton.FloatingActionsMenu mAddlist;
 
     private com.getbase.floatingactionbutton.FloatingActionButton scan;
@@ -109,6 +113,10 @@ public class MapFragment extends Fragment {
     private List<Marker> lampmarkerlist;
     private int markerindex;
     private int lampindex;
+
+    private Marker point;//点击后出现的小点点
+    private BitmapDescriptor bitmap_onclick;
+    private boolean controllclick;
 
 
     private EditText NAME;
@@ -144,9 +152,56 @@ public class MapFragment extends Fragment {
         mView = inflater.inflate(R.layout.map_fragment, container, false);
 
         mAddlist = (com.getbase.floatingactionbutton.FloatingActionsMenu) mView.findViewById(R.id.addItem);
-        mAddLamp = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemLamp);
-        mAddControllor = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.addItemControl);
+        mAddLamp = new com.getbase.floatingactionbutton.FloatingActionButton(getActivity());
+        mAddControllor =  new com.getbase.floatingactionbutton.FloatingActionButton(getActivity());
         refresh = (com.getbase.floatingactionbutton.FloatingActionButton) mView.findViewById(R.id.refresh);
+
+        mAddControllor.setSize(com.getbase.floatingactionbutton.FloatingActionButton.SIZE_MINI);
+        mAddControllor.setIcon(R.drawable.icons_controller_gray);
+        mAddControllor.setColorNormalResId(R.color.white);
+        mAddControllor.setColorPressedResId(R.color.instruction);
+        mAddControllor.setTitle(getString(R.string.controller));
+
+        mAddLamp.setSize(com.getbase.floatingactionbutton.FloatingActionButton.SIZE_MINI);
+        mAddLamp.setIcon(R.drawable.icons_pot);
+        mAddLamp.setColorNormalResId(R.color.white);
+        mAddLamp.setColorPressedResId(R.color.instruction);
+        mAddLamp.setTitle(getString(R.string.lamp));
+
+        mLampoff= new com.getbase.floatingactionbutton.FloatingActionButton(getActivity());
+        mLampadjust= new com.getbase.floatingactionbutton.FloatingActionButton(getActivity());
+        mdelete= new com.getbase.floatingactionbutton.FloatingActionButton(getActivity());
+
+
+        mLampoff.setSize(com.getbase.floatingactionbutton.FloatingActionButton.SIZE_MINI);
+        mLampoff.setIcon(R.drawable.icon_lamp_off_large);
+        mLampoff.setColorNormalResId(R.color.white);
+        mLampoff.setColorPressedResId(R.color.instruction);
+        mLampoff.setTitle("Turn off");
+
+        mLampadjust.setSize(com.getbase.floatingactionbutton.FloatingActionButton.SIZE_MINI);
+        mLampadjust.setIcon(R.drawable.icons_lamp_adjust_large);
+        mLampadjust.setColorNormalResId(R.color.white);
+        mLampadjust.setColorPressedResId(R.color.instruction);
+        mLampadjust.setTitle("Light adjust");
+
+        mdelete.setSize(com.getbase.floatingactionbutton.FloatingActionButton.SIZE_MINI);
+        mdelete.setIcon(R.drawable.icon_delete);
+        mdelete.setColorNormalResId(R.color.white);
+        mdelete.setColorPressedResId(R.color.instruction);
+        mdelete.setTitle("Delete");
+
+
+        mAddlist.addButton(mdelete);
+        mdelete.setVisibility(View.INVISIBLE);
+        mAddlist.addButton(mLampadjust);
+        mLampadjust.setVisibility(View.INVISIBLE);
+        mAddlist.addButton(mLampoff);
+        mLampoff.setVisibility(View.INVISIBLE);
+
+        mAddlist.addButton(mAddControllor);
+        mAddlist.addButton(mAddLamp);
+
 
 
         initMap();
@@ -185,6 +240,8 @@ public class MapFragment extends Fragment {
         refresh.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                LatLng initpoint = new LatLng(0, 0);
+                point.setPosition(initpoint);
                 for(int i=0;i<markerlist.size();i++){
                     markerlist.get(i).remove();
                 }
@@ -209,8 +266,17 @@ public class MapFragment extends Fragment {
         lampindex = 0;
         numberoflamp = 1;
         numberofcontrol = 1;
+        controllclick = false;
         markerlist = new ArrayList<Marker>();
         lampmarkerlist = new ArrayList<Marker>();
+
+
+
+        point = null;
+        bitmap_onclick = BitmapDescriptorFactory
+                .fromResource(R.drawable.icons_pin_controller_click);
+
+
         //获取地图控件引用
         mMapView = (MapView) mView.findViewById(R.id.baidu_map);
         // 不显示缩放比例尺
@@ -220,6 +286,12 @@ public class MapFragment extends Fragment {
         //百度地图
         mBaidumap = mMapView.getMap();
         mBaidumap.setMyLocationEnabled(true);
+        //初始化 加上point但是没位置
+        LatLng initpoint = new LatLng(0, 0);
+        OverlayOptions option = new MarkerOptions()
+                .position(initpoint)
+                .icon(bitmap_onclick);
+        point = (Marker) mBaidumap.addOverlay(option);
         // 改变地图状态
         MapStatus mMapStatus = new MapStatus.Builder().zoom(15).build();
         MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
@@ -228,9 +300,18 @@ public class MapFragment extends Fragment {
         mBaidumap.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
             @Override
             public void onMapStatusChangeStart(MapStatus arg0) {
-                //mAddlist.removeButton(mLampon);
-                mAddControllor.setIcon(R.drawable.icons_controller_gray);
+              Log.i("children count",String.valueOf(mAddlist.getChildCount()));
+                if(controllclick){
+                    mAddControllor.setIcon(R.drawable.icons_controller_gray);
+                    mAddControllor.setTitle(getString(R.string.controller));
+                    mLampoff.setVisibility(View.INVISIBLE);
+                    mLampadjust.setVisibility(View.INVISIBLE);
+                    mdelete.setVisibility(View.INVISIBLE);
+                }
+                /*mAddControllor.setIcon(R.drawable.icons_controller_gray);
+                mAddControllor.setTitle(getString(R.string.controller));
                 mAddLamp.setIcon(R.drawable.icons_pot);
+                */
                 //应该加一个初始化按钮的函数，恢复到初始状态
                 mAddLamp.setOnClickListener(new View.OnClickListener(){
                     @Override
@@ -249,15 +330,17 @@ public class MapFragment extends Fragment {
                     }
                 });
                 //mBaidumap.clear();
-                for(int i = 0;i<markerlist.size();i++){
+                /*for(int i = 0;i<markerlist.size();i++){
                     bitmap = BitmapDescriptorFactory
                             .fromResource(R.drawable.icons_pin_controller);
                     markerlist.get(i).setIcon(bitmap);
-                }
+                }*/
             }
 
             @Override
             public void onMapStatusChangeFinish(MapStatus arg0) {
+                controllclick = false;
+                Log.i("finish","in");
             }
 
             @Override
@@ -427,7 +510,11 @@ public class MapFragment extends Fragment {
             cuidvalue.setEms(10);
             cuidvalue.setLayoutParams(lampParams2);
             cuidvalue.setText(cuid_now);
-            cuidvalue.setEnabled(false);
+            if (controllclick) {
+                cuidvalue.setEnabled(false);
+            }
+            else
+                cuidvalue.setEnabled(true);
             container.addView(cuidvalue);
 
 
@@ -439,7 +526,7 @@ public class MapFragment extends Fragment {
             }
             ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item,alllamp);
             list_lamp.setAdapter(adapter1);
-            LinearLayout.LayoutParams lampParams1 = new LinearLayout.LayoutParams(DensityUtil.dp2px(getActivity(),210),LinearLayout.LayoutParams.WRAP_CONTENT,1);
+            LinearLayout.LayoutParams lampParams1 = new LinearLayout.LayoutParams(DensityUtil.dp2px(getActivity(),210),DensityUtil.dp2px(getActivity(),50),1);
             lampParams1.gravity = Gravity.CENTER;
             list_lamp.setLayoutParams(lampParams1);
             container.addView(list_lamp);
@@ -509,7 +596,7 @@ public class MapFragment extends Fragment {
         }
 
         if(addaction==1) {
-            NAME.setText("Controller"+String.valueOf(numberofcontrol));
+            NAME.setText("Controllercuidvalue.setEnabled(false);"+String.valueOf(numberofcontrol));
             ok.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
@@ -618,18 +705,18 @@ public class MapFragment extends Fragment {
         //构建Marker图标
         if(type == 1) {
             bitmap = BitmapDescriptorFactory
-                    .fromResource(R.drawable.icons_pin_controller);
+                    .fromResource(R.drawable.icons_pin_controller_new);
         }
         if(type ==0){
             bitmap = BitmapDescriptorFactory
-                    .fromResource(R.drawable.icons_pin_lamp);
+                    .fromResource(R.drawable.icons_pin_lamp_new);
         }
         //构建MarkerOption，用于在地图上添加Marker
         OverlayOptions option = new MarkerOptions()
                 .position(point)
                 .icon(bitmap);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("type",type);
+        bundle.putSerializable("type",String.valueOf(type));
         bundle.putSerializable("info", name);
         bundle.putSerializable("cuid",cuid);
         bundle.putSerializable("luid",luid);
@@ -655,9 +742,10 @@ public class MapFragment extends Fragment {
          */
         public boolean onMarkerClick(Marker marker){
             InfoWindow mInfoWindow;
-            BitmapDescriptor bitmap_onclick = BitmapDescriptorFactory
-                    .fromResource(R.drawable.icons_controller_onselected_small);
-            marker.setIcon(bitmap_onclick);
+
+
+            point.setPosition(marker.getPosition());
+            point.setToTop();
 
             Bundle res = marker.getExtraInfo();
             String a = res.getString("cuid");
@@ -666,21 +754,32 @@ public class MapFragment extends Fragment {
             Log.i("ssid now",ssid_now);
 
             //点击后动态改变浮动按钮的功能
-            mLampon= new com.getbase.floatingactionbutton.FloatingActionButton(getActivity());
-            //点击按钮以后把按钮显示改掉
-            mAddLamp.setIcon(R.drawable.icon_lamp_on);
-            mAddControllor.setIcon(R.drawable.icon_lamp_off);
-            mAddLamp.setTitle("Turn on");
-            mLampon.setSize(com.getbase.floatingactionbutton.FloatingActionButton.SIZE_MINI);
-            //mAddlist.addButton(mLampon);
-            //mAddControllor.setIcon(R.drawable.icons_controller_white);
-            mAddLamp.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view){
-                   testClient.senddata("ctrl-km","turn-on","1","zh_CN",""+cuid_now+"","1","{\"sid\":\""+ssid_now+"\",\"kms\":null}");
-                }
-            });
 
+            //如果点击的是集中器的按钮，改变按钮的布局
+            if("1".equals(res.getString("type"))) {
+                mAddControllor.setIcon(R.drawable.icon_lamp_on_large);
+                mAddControllor.setTitle("Turn on");
+
+                mLampoff.setVisibility(View.VISIBLE);
+                mLampadjust.setVisibility(View.VISIBLE);
+                mdelete.setVisibility(View.VISIBLE);
+
+                controllclick = true;
+                //mAddControllor.setIcon(R.drawable.icons_controller_white);
+                mAddControllor.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        testClient.senddata("ctrl-km", "turn-on", "1", "zh_CN", "" + cuid_now + "", "1", "{\"sid\":\"" + ssid_now + "\",\"kms\":null}");
+                    }
+                });
+
+                mdelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        alert();
+                    }
+                });
+            }
 
 
             TextView location = new TextView(getActivity().getApplicationContext());
@@ -792,6 +891,31 @@ public class MapFragment extends Fragment {
             msg.setData(data);
             handler.sendMessage(msg);
         }
+    }
+
+    private void alert(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("Delete with caution");
+        builder.setTitle("Warning");
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //发送删除指令
+                upload.setParam(10,null,null,ssid_now,null,null,null,0,0);
+                new Thread(upload).start();
+
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                new Thread(mrefresh).start();
+                handler.postDelayed(new maphandler(),1000);
+            }
+        });
+        builder.create().show();
     }
 
 }

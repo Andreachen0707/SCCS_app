@@ -59,6 +59,7 @@ import static com.example.dell.sccs_app.StaticValue.askLampUrl;
 import static com.example.dell.sccs_app.StaticValue.askLucUrl;
 import static com.example.dell.sccs_app.StaticValue.askProjectListUrl;
 import static com.example.dell.sccs_app.StaticValue.connectState;
+import static com.example.dell.sccs_app.StaticValue.deletestation;
 import static com.example.dell.sccs_app.StaticValue.deviceListData;
 import static com.example.dell.sccs_app.StaticValue.infostate_1;
 import static com.example.dell.sccs_app.StaticValue.infostate_2;
@@ -396,6 +397,12 @@ public class LoginProcess extends AppCompatActivity {
             case 0:
                 link = logout;
                 break;
+
+            case 10:
+                link = deletestation;
+                body = "{\"wheres\":[{\"k\":\"stationId\",\"o\":\"=\",\"v\":\""+ssid+"\"}],\"orders\":[]}";
+                break;
+
             default:
                 break;
 
