@@ -485,7 +485,7 @@ public class LoginProcess extends AppCompatActivity {
                 deviceListData.add(i,device);
                 i++;
             }
-            infostate_1 = true;
+
             //Log.i("elecid",deviceListData.get(1).getModelId());
         } else if(type == 3) {
             ElectricListData.clear();
@@ -518,6 +518,7 @@ public class LoginProcess extends AppCompatActivity {
                 Log.i("station id",i+StationData.get(i).getSid());
                 i++;
             }
+            infostate_1 = true;
         }
         else if(type == 6){
             LcuData.clear();

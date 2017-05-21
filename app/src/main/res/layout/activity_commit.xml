@@ -42,16 +42,6 @@
                 android:textSize="@dimen/text_view" />
 
             <TextView
-                android:id="@+id/lng"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Longitude:"
-                android:textSize="@dimen/text_view" />
-
-            <TextView
                 android:id="@+id/lat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -59,6 +49,16 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Latitude:"
+                android:textSize="@dimen/text_view" />
+
+            <TextView
+                android:id="@+id/lng"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Longitude:"
                 android:textSize="@dimen/text_view" />
 
 

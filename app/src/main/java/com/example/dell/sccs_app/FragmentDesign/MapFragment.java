@@ -194,10 +194,13 @@ public class MapFragment extends Fragment {
 
         mAddlist.addButton(mdelete);
         mdelete.setVisibility(View.INVISIBLE);
+        mdelete.setEnabled(false);
         mAddlist.addButton(mLampadjust);
         mLampadjust.setVisibility(View.INVISIBLE);
+        mdelete.setEnabled(false);
         mAddlist.addButton(mLampoff);
         mLampoff.setVisibility(View.INVISIBLE);
+        mdelete.setEnabled(false);
 
         mAddlist.addButton(mAddControllor);
         mAddlist.addButton(mAddLamp);
@@ -287,7 +290,7 @@ public class MapFragment extends Fragment {
         mBaidumap = mMapView.getMap();
         mBaidumap.setMyLocationEnabled(true);
         //初始化 加上point但是没位置
-        LatLng initpoint = new LatLng(0, 0);
+        final LatLng initpoint = new LatLng(0, 0);
         OverlayOptions option = new MarkerOptions()
                 .position(initpoint)
                 .icon(bitmap_onclick);
@@ -300,13 +303,20 @@ public class MapFragment extends Fragment {
         mBaidumap.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
             @Override
             public void onMapStatusChangeStart(MapStatus arg0) {
+                point.setPosition(initpoint);
               Log.i("children count",String.valueOf(mAddlist.getChildCount()));
                 if(controllclick){
                     mAddControllor.setIcon(R.drawable.icons_controller_gray);
                     mAddControllor.setTitle(getString(R.string.controller));
-                    mLampoff.setVisibility(View.INVISIBLE);
-                    mLampadjust.setVisibility(View.INVISIBLE);
+
                     mdelete.setVisibility(View.INVISIBLE);
+                    mdelete.setEnabled(false);
+
+                    mLampadjust.setVisibility(View.INVISIBLE);
+                    mdelete.setEnabled(false);
+
+                    mLampoff.setVisibility(View.INVISIBLE);
+                    mdelete.setEnabled(false);
                 }
                 /*mAddControllor.setIcon(R.drawable.icons_controller_gray);
                 mAddControllor.setTitle(getString(R.string.controller));
@@ -596,7 +606,7 @@ public class MapFragment extends Fragment {
         }
 
         if(addaction==1) {
-            NAME.setText("Controllercuidvalue.setEnabled(false);"+String.valueOf(numberofcontrol));
+            NAME.setText("Controller"+String.valueOf(numberofcontrol));
             ok.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
@@ -607,7 +617,10 @@ public class MapFragment extends Fragment {
                     upload.setParam(7,name,cuid,name,null,null,null,gpslatitude,gpslongitude);
                     numberofcontrol++;
                     new Thread(upload).start();
-                    mapAnnotation(name,cuid,null,null,1,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
+                    mrefresh.setParam(5,null,null,null,null,null,null,0,0);
+                    new Thread(mrefresh).start();
+                    handler.post(new maphandler());
+                    //mapAnnotation(name,cuid,null,null,1,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
                     bottomDialog.dismiss();
                 }
             });
@@ -761,8 +774,11 @@ public class MapFragment extends Fragment {
                 mAddControllor.setTitle("Turn on");
 
                 mLampoff.setVisibility(View.VISIBLE);
+                mLampoff.setEnabled(true);
                 mLampadjust.setVisibility(View.VISIBLE);
+                mLampadjust.setEnabled(true);
                 mdelete.setVisibility(View.VISIBLE);
+                mdelete.setEnabled(true);
 
                 controllclick = true;
                 //mAddControllor.setIcon(R.drawable.icons_controller_white);
@@ -792,7 +808,7 @@ public class MapFragment extends Fragment {
             //为弹出的InfoWindow添加点击事件
             mInfoWindow = new InfoWindow(location, llInfo, 0);
             //显示InfoWindow
-            mBaidumap.showInfoWindow(mInfoWindow);
+            //mBaidumap.showInfoWindow(mInfoWindow);
             return false;
         }
     };
@@ -837,6 +853,17 @@ public class MapFragment extends Fragment {
             Log.i("fuck",type);
             if("0".equals(type))
                 Log.i("Log out","true");
+
+            if("10".equals(String.valueOf(type))) {
+                Toast.makeText(getActivity(), "Delete Successful", Toast.LENGTH_LONG).show();
+                point.setPosition(new LatLng(0,0));
+                mrefresh.setParam(5,null,null,null,null,null,null,0,0);
+                new Thread(mrefresh).start();
+                handler.post(new maphandler());
+            }
+
+            if("".equals(val))
+                Log.i("no response","retry");
 
             else {
                 if (val.charAt(0) == '1') {
@@ -903,7 +930,9 @@ public class MapFragment extends Fragment {
                 //发送删除指令
                 upload.setParam(10,null,null,ssid_now,null,null,null,0,0);
                 new Thread(upload).start();
-
+                /*mrefresh.setParam(5,null,null,null,null,null,null,0,0);
+                new Thread(mrefresh).start();
+                handler.post(new maphandler());*/
                 dialog.dismiss();
             }
         });
@@ -911,8 +940,7 @@ public class MapFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                new Thread(mrefresh).start();
-                handler.postDelayed(new maphandler(),1000);
+
             }
         });
         builder.create().show();
