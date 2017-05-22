@@ -326,6 +326,20 @@ public class MapFragment extends Fragment {
                 }
 
                 if(lampclick){
+                    mAddControllor.setIcon(R.drawable.icons_controller_gray);
+                    mAddControllor.setTitle(getString(R.string.controller));
+
+                    mAddLamp.setIcon(R.drawable.icons_pot);
+                    mAddLamp.setTitle(getString(R.string.lamp));
+
+                    mdelete.setVisibility(View.INVISIBLE);
+                    mdelete.setEnabled(false);
+
+                    mLampadjust.setVisibility(View.INVISIBLE);
+                    mdelete.setEnabled(false);
+
+                    mLampoff.setVisibility(View.INVISIBLE);
+                    mdelete.setEnabled(false);
 
                 }
                 /*mAddControllor.setIcon(R.drawable.icons_controller_gray);
@@ -371,7 +385,6 @@ public class MapFragment extends Fragment {
             public void onMapStatusChange(MapStatus arg0) {
                 //当地图状态改变的时候，获取放大级别
                 zoomLevel = arg0.zoom;
-                Log.i("zoom lever",String.valueOf(zoomLevel));
             }
         });
         mBaidumap.setOnMarkerClickListener(markerClick);
@@ -746,8 +759,7 @@ public class MapFragment extends Fragment {
          */
         public boolean onMarkerClick(Marker marker){
             InfoWindow mInfoWindow;
-            point.setPosition(marker.getPosition());
-            point.setToTop();
+
 
             Bundle res = marker.getExtraInfo();
             String a = res.getString("cuid");
@@ -761,6 +773,8 @@ public class MapFragment extends Fragment {
             //点击后动态改变浮动按钮的功能
             //如果点击的是集中器的按钮，改变按钮的布局
             if("1".equals(type)) {
+                point.setPosition(marker.getPosition());
+                point.setToTop();
                 queryopen.setParam(12,null,null,ssid_now,null,null,null,null,0,0);
                 new Thread(queryopen).start();
 
@@ -815,6 +829,7 @@ public class MapFragment extends Fragment {
 
             else{
                 //改变浮动按钮的内容
+                controllclick  = false;
                 mAddLamp.setIcon(R.drawable.icon_lamp_on_large);
                 mAddLamp.setTitle("Turn on");
                 mAddControllor.setIcon(R.drawable.icon_lamp_off_large);
@@ -827,6 +842,9 @@ public class MapFragment extends Fragment {
                 mLampadjust.setEnabled(true);
                 mLampadjust.setIcon(R.drawable.icon_delete);
                 mLampadjust.setTitle("Delete");
+
+                mdelete.setVisibility(View.INVISIBLE);
+                mdelete.setEnabled(false);
 
                 lampclick = true;
 
