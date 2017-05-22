@@ -13,6 +13,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Gravity;
@@ -154,6 +155,7 @@ public class Project extends AppCompatActivity
     private  MyThread2 m3 = new MyThread2();
     private  MyThread2 m4 = new MyThread2();
     private  MyThread2 m5 = new MyThread2();
+    private  MyThread2 m6 = new MyThread2();
     private int mapIndex = 0;
 
     public static String username;
@@ -169,6 +171,7 @@ public class Project extends AppCompatActivity
     private List<Fragment> mFragments;
     private AppBarLayout  mAppBarLayout;
     private String[] mTitles;
+    private String[] mtest;
 
     private Fragment Fragment_Map;
     private Fragment Fragment_Project;
@@ -186,71 +189,6 @@ public class Project extends AppCompatActivity
         initViews();
         initSet();
         configview();
-
-        /*SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(Project.this);*/
-
-       /* Button scan = (Button)findViewById(R.id.scan);
-        scan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Project.this,Add.class);
-                startActivity(intent);
-            }
-        });
-
-        Button getlist = (Button)findViewById(R.id.getlist) ;
-        getlist.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                connectType = 2;
-                MyThread2 m2 = new MyThread2();
-                m2.setName(connectType);
-                new Thread(m2).start();
-            }
-        });
-
-        Button getelec = (Button)findViewById(R.id.getelec) ;
-        getelec.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                connectType = 3;
-                MyThread2 m3 = new MyThread2();
-                m3.setName(connectType);
-                new Thread(m3).start();
-            }
-        });
-
-        Button send = (Button)findViewById(R.id.send) ;
-        send.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                connectType = 4;
-                lat = 30.265571244862127;
-                lng = 120.18019689712332;
-                name ="AAAAA";
-                cuid = "000FONDA_673";
-                MyThread2 m4 = new MyThread2();
-                m4.setName(connectType);
-                new Thread(m4).start();
-            }
-        });
-
-        /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();*/
-                /*Intent scan = new Intent(Project.this,Scan.class);
-                startActivity(scan);
-                Add_show();
-            }
-        });*/
-
-
-
-
 
     }
 
@@ -298,7 +236,8 @@ public class Project extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @Override public void onPageSelected(int position) {
+    @Override
+    public void onPageSelected(int position) {
         mToolbar.setTitle(mTitles[position]);
     }
     @Override
@@ -325,6 +264,7 @@ public class Project extends AppCompatActivity
         m3.setName(4);
         m4.setName(5);
         m5.setName(6);
+        m6.setName(11);
         new Thread(networkTask).start();
     }
 
@@ -332,6 +272,7 @@ public class Project extends AppCompatActivity
 
         // Tab的标题采用string-array的方法保存，在res/values/arrays.xml中写
         mTitles = getResources().getStringArray(R.array.tab_titles);
+        mtest = getResources().getStringArray(R.array.test_list);
 
         //初始化填充到ViewPager中的Fragment集合
         mFragments = new ArrayList<>();
@@ -403,9 +344,18 @@ public class Project extends AppCompatActivity
 
                 if (id == R.id.nav_camera) {
                     // Handle the camera action
-                } else if (id == R.id.nav_gallery) {
+                    //mAppBarLayout.addView(mTabLayout);
 
-                } else if (id == R.id.nav_manage) {
+                } else if (id == R.id.nav_gallery) {
+                    Intent intent = new Intent();
+                    intent.setClass(Project.this,Project_list.class);
+                    intent.putExtra("name",String.valueOf(item.getTitle()));
+                    startActivity(intent);
+
+
+                }
+                else if (id == R.id.nav_manage) {
+                    //退出
                     connectType = 0;
                     MyThread2 m4 = new MyThread2();
                     m4.setName(connectType);
@@ -727,11 +677,14 @@ public class Project extends AppCompatActivity
             new Thread(m3).start();
             new Thread(m4).start();
             new Thread(m5).start();
+            new Thread(m6).start();
         }
         else
             Log.i("failed","yes failed");
     }
 
+
+    //连websocket
     public void connectToServer(String ip, String port, String type) {
         String address = String.format("ws://%s:%s/api/ws", ip, port);
         Draft draft = new Draft_17();
@@ -787,6 +740,7 @@ public class Project extends AppCompatActivity
 
     }
 
+    //发送心跳包
     public void startHeartTimer(boolean start) {
         if (start) {
             if (_axTimer == null)
@@ -832,8 +786,14 @@ public class Project extends AppCompatActivity
             mClient.senddata("login","session","1","","","0",jsonParam.toString());
             Log.i("sid test",jsonParam.toString());
             //mClient.senddata("login", "session","1","zh_CN", "" , "" , "",sid);
-            if(mClient.isOpen()==true) {
+            if(mClient.isOpen()) {
                 startHeartTimer(true);
+                mClient.senddata("login", "add-listener","1","zh_CN","" , "0" , "{\"cmd\":\"push-rtu\",\"ctrl\":\"info\",\"ver\":\"1\"}");
+                mClient.senddata("login", "add-listener","1","zh_CN","" , "0" , "{\"cmd\":\"push-lcu\",\"ctrl\":\"status\",\"ver\":\"1\"}");
+                mClient.senddata("login", "add-listener","1","zh_CN","" , "0" , "{\"cmd\":\"push-lcu\",\"ctrl\":\"data\",\"ver\":\"1\"}");
+                mClient.senddata("login", "add-listener","1","zh_CN","" , "0" , "{\"cmd\":\"push-lcu\",\"ctrl\":\"action\",\"ver\":\"1\"}");
+                mClient.senddata("login", "add-listener","1","zh_CN","" , "0" , "{\"cmd\":\"push-alarm\",\"ctrl\":\"alarm\",\"ver\":\"1\"}");
+                mClient.senddata("login", "add-listener","1","zh_CN","" , "0" , "{\"cmd\":\"push-process\",\"ctrl\":\"info\",\"ver\":\"1\"}");
             }
             /*Message msg = new Message();
             msg.what = STATUS_CONNECT;
@@ -972,7 +932,16 @@ public class Project extends AppCompatActivity
         }
     }
 
+    public void popBackStack(String name,int ind){
+
+    }
+
+    //其他fragment的调用接口
     public WebClient getmClient(){
         return mClient;
+    }
+
+    public ViewPager getmViewPager(){
+        return mViewPager;
     }
 }

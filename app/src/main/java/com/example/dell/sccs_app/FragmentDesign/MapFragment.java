@@ -71,6 +71,7 @@ import static android.drm.DrmStore.DrmObjectType.CONTENT;
 import static com.example.dell.sccs_app.LoginProcess.getProject;
 import static com.example.dell.sccs_app.StaticValue.LampListData;
 import static com.example.dell.sccs_app.StaticValue.LcuData;
+import static com.example.dell.sccs_app.StaticValue.Lcu_lampData;
 import static com.example.dell.sccs_app.StaticValue.StationData;
 import static com.example.dell.sccs_app.StaticValue.addaction;
 import static com.example.dell.sccs_app.Util.GPS_convert.bd09_To_Gps84;
@@ -127,7 +128,9 @@ public class MapFragment extends Fragment {
     private Button cancel;
 
     private MyUpdate upload = new MyUpdate();
+    private MyUpdate queryopen = new MyUpdate();
     private MyUpdate mrefresh = new MyUpdate();
+    private MyUpdate mLamp = new MyUpdate();
 
     private String name;
     private String cuid;
@@ -357,6 +360,7 @@ public class MapFragment extends Fragment {
             public void onMapStatusChange(MapStatus arg0) {
                 //当地图状态改变的时候，获取放大级别
                 zoomLevel = arg0.zoom;
+                Log.i("zoom lever",String.valueOf(zoomLevel));
             }
         });
         mBaidumap.setOnMarkerClickListener(markerClick);
@@ -377,33 +381,6 @@ public class MapFragment extends Fragment {
         option.setIsNeedLocationPoiList(true);//可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
         mLocationClient.setLocOption(option);
         mLocationClient.start();
-    }
-
-    private class maphandler implements Runnable
-    {
-        public void run()
-        {
-            //初始化在地图上标记
-            if(StationData.size()!=0) {
-                for(int t = 0;t<StationData.size();t++) {
-                    double slatitude = StationData.get(t).getLat();
-                    double slongitude = StationData.get(t).getLng();
-
-                    LatLng sourceLatLng = new LatLng(slatitude,slongitude);
-                    CoordinateConverter converter  = new CoordinateConverter();
-                    converter.from(CoordinateConverter.CoordType.GPS);
-                    // sourceLatLng待转换坐标
-                    converter.coord(sourceLatLng);
-                    LatLng desLatLng = converter.convert();
-                    slatitude = desLatLng.latitude;
-                    slongitude = desLatLng.longitude;
-
-                    mapAnnotation(StationData.get(t).getName(),StationData.get(t).getCuid(),StationData.get(t).getSid(),null,1,slatitude,slongitude);
-                }
-            }
-            else
-                Toast.makeText(getActivity(),"Pull to refresh",Toast.LENGTH_SHORT).show();
-        }
     }
 
     public static double convertToDouble(String number, double defaultValue) {
@@ -588,6 +565,7 @@ public class MapFragment extends Fragment {
                     //添加灯的指令
                     name = NAME.getText().toString();
                     luid = UID.getText().toString();
+
                     upload.setParam(8,name,cuid_now,ssid_now,luid,lmodelid,lcumodelid,gpslatitude,gpslongitude);
                     numberoflamp++;
                     new Thread(upload).start();
@@ -655,6 +633,7 @@ public class MapFragment extends Fragment {
 
                     else {
                         String res = bundle.getString("scan_result");
+                        Log.i("result test",res);
                         switch (requestCode) {
                             case 0:
                                 Log.i("scan_test","in");
@@ -757,6 +736,7 @@ public class MapFragment extends Fragment {
             InfoWindow mInfoWindow;
 
 
+
             point.setPosition(marker.getPosition());
             point.setToTop();
 
@@ -770,6 +750,16 @@ public class MapFragment extends Fragment {
 
             //如果点击的是集中器的按钮，改变按钮的布局
             if("1".equals(res.getString("type"))) {
+
+
+                mLamp.setParam(9,null,null,ssid_now,null,null,null,0,0);
+                new Thread(mLamp).start();
+                //画灯
+                if(zoomLevel>19){
+                    queryopen.setParam(12,null,null,ssid_now,null,null,null,0,0);
+                    new Thread(queryopen).start();
+                }
+
                 mAddControllor.setIcon(R.drawable.icon_lamp_on_large);
                 mAddControllor.setTitle("Turn on");
 
@@ -786,6 +776,9 @@ public class MapFragment extends Fragment {
                     @Override
                     public void onClick(View view) {
                         testClient.senddata("ctrl-km", "turn-on", "1", "zh_CN", "" + cuid_now + "", "1", "{\"sid\":\"" + ssid_now + "\",\"kms\":null}");
+                       // testClient.senddata("push-lcu","status","1","","","","{\"sid\":\""+ssid_now+"\",\"cuid\":\""+cuid_now+"\",\"ctype\":1,\"luid\":\""+luid+"\",\"alarms\":[],\"lights\":[{\"lid\":\""+lcumodelid+"\",\"ch\":1,\"rs\":2,\"ls\":2,\"dim\":0,\"acount\":0,\"alarms\":[],\"ltime\":1495450796317}]}");
+
+
                     }
                 });
 
@@ -875,6 +868,13 @@ public class MapFragment extends Fragment {
                 handler.post(new maphandler());
             }
 
+            if("9".equals(String.valueOf(type))){
+                for(int i = 0;i<Lcu_lampData.size();i++) {
+                    mapAnnotation(Lcu_lampData.get(i).getName(),Lcu_lampData.get(i).getCuid(),Lcu_lampData.get(i).getSid(),Lcu_lampData.get(i).getLuid(),
+                            0,Lcu_lampData.get(i).getLat(),Lcu_lampData.get(i).getLng());
+                }
+            }
+
             if("".equals(val))
                 Log.i("no response","retry");
 
@@ -930,6 +930,57 @@ public class MapFragment extends Fragment {
             data.putString("type", String.valueOf(type));
             msg.setData(data);
             handler.sendMessage(msg);
+        }
+    }
+
+
+    private class maphandler implements Runnable
+    {
+        public void run()
+        {
+            //初始化在地图上标记
+            if(StationData.size()!=0) {
+                for(int t = 0;t<StationData.size();t++) {
+                    double slatitude = StationData.get(t).getLat();
+                    double slongitude = StationData.get(t).getLng();
+
+                    LatLng sourceLatLng = new LatLng(slatitude,slongitude);
+                    CoordinateConverter converter  = new CoordinateConverter();
+                    converter.from(CoordinateConverter.CoordType.GPS);
+                    // sourceLatLng待转换坐标
+                    converter.coord(sourceLatLng);
+                    LatLng desLatLng = converter.convert();
+                    slatitude = desLatLng.latitude;
+                    slongitude = desLatLng.longitude;
+
+                    mapAnnotation(StationData.get(t).getName(),StationData.get(t).getCuid(),StationData.get(t).getSid(),null,1,slatitude,slongitude);
+                }
+            }
+            else
+                Toast.makeText(getActivity(),"Pull to refresh",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class Lamphandler implements Runnable
+    {
+        public void run()
+        {
+            //初始化在地图上标记
+                for(int t = 0;t<StationData.size();t++) {
+                    double slatitude = StationData.get(t).getLat();
+                    double slongitude = StationData.get(t).getLng();
+
+                    LatLng sourceLatLng = new LatLng(slatitude,slongitude);
+                    CoordinateConverter converter  = new CoordinateConverter();
+                    converter.from(CoordinateConverter.CoordType.GPS);
+                    // sourceLatLng待转换坐标
+                    converter.coord(sourceLatLng);
+                    LatLng desLatLng = converter.convert();
+                    slatitude = desLatLng.latitude;
+                    slongitude = desLatLng.longitude;
+
+                    mapAnnotation(StationData.get(t).getName(),StationData.get(t).getCuid(),StationData.get(t).getSid(),null,1,slatitude,slongitude);
+                }
         }
     }
 

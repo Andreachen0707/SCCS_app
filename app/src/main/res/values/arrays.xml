@@ -64,4 +64,10 @@
     <item>@string/map</item>
     <item>@string/history</item>
   </string-array>
+
+  <string-array name="test_list">
+    <item>项目总览</item>
+    <item>部署</item>
+    <item>历史</item>
+  </string-array>
 </resources>

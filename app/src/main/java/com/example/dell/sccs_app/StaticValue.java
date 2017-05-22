@@ -1,11 +1,13 @@
 package com.example.dell.sccs_app;
 
+import com.example.dell.sccs_app.Bean.AidiBean;
 import com.example.dell.sccs_app.Bean.ConcentratorBean;
 import com.example.dell.sccs_app.Bean.DeviceListBean;
 import com.example.dell.sccs_app.Bean.ElectricListBean;
 import com.example.dell.sccs_app.Bean.LampListBean;
 import com.example.dell.sccs_app.Bean.LcuBean;
 import com.example.dell.sccs_app.Bean.Lcu_lampBean;
+import com.example.dell.sccs_app.Bean.OpenBean;
 import com.example.dell.sccs_app.Bean.ProjectBean;
 import com.example.dell.sccs_app.Bean.StationBean;
 
@@ -30,6 +32,9 @@ public class StaticValue {
     public static String askStationListUrl = basicURL+"/api/json?cmd=station-info&ctrl=list&version=1&lang=zh_CN&sid=";
     public static String askConcentratorUrl = basicURL+"/api/json?cmd=modelRtu&ctrl=page&version=1&lang=zh_CN&sid=";
     public static String askElectricUrl = "http://121.40.34.92:7070/api/json?cmd=modelMeter&ctrl=list&version=1&lang=zh_CN&sid=";
+    public static String askAidiUrl = "http://121.40.34.92:7070/api/json?cmd=modelAidi&ctrl=list&version=1&lang=zh_CN&sid=";
+
+    public static String askOpenUrl = "http://121.40.34.92:7070/api/json?cmd=device&ctrl=list&version=1&lang=zh_CN&sid=";
     public static String askLampUrl = "http://121.40.34.92:7070/api/json?cmd=modellamp&ctrl=page&version=1&lang=zh_CN&sid=";
     public static String askLucUrl = "http://121.40.34.92:7070/api/json?cmd=modelLcu&ctrl=list&version=1&lang=zh_CN&sid=";
 
@@ -53,6 +58,9 @@ public class StaticValue {
     public static ArrayList<ProjectBean> projectData = new ArrayList<>();
     public static ArrayList<DeviceListBean> deviceListData = new ArrayList<>();
     public static ArrayList<ElectricListBean> ElectricListData = new ArrayList<>();
+    public static ArrayList<AidiBean> AidiData = new ArrayList<>();
+    public static ArrayList<OpenBean> OpenData = new ArrayList<>();
+
     public static ArrayList<LampListBean> LampListData = new ArrayList<>();
     public static ArrayList<StationBean> StationData = new ArrayList<>();
     public static ArrayList<LcuBean> LcuData = new ArrayList<>();

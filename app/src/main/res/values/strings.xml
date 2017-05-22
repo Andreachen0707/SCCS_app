@@ -58,4 +58,7 @@
     <string name="controller">控制器</string>
     <string name="lamp">灯具</string>
     <string name="title_activity_maps_test">Map</string>
+
+    <!--String related to project list-->
+    <string name="Project_detail"> 项目总览</string>
 </resources>

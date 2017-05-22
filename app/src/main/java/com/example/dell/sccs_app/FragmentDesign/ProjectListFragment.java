@@ -32,7 +32,7 @@ import static com.example.dell.sccs_app.StaticValue.project_get;
  * Created by dell on 2017/5/4.
  */
 
-public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class ProjectListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private List<String> project_name = new ArrayList<String>();
     private ListView project_list;
     private TextView tempProject;
@@ -45,7 +45,7 @@ public class ProjectFragment extends Fragment implements SwipeRefreshLayout.OnRe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        mView = inflater.inflate(R.layout.project_list, container, false);
+        mView = inflater.inflate(R.layout.content_main, container, false);
 
         testViewpager = ((Project)getActivity()).getmViewPager();
 

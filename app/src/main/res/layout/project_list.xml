@@ -8,7 +8,7 @@
     android:layout_height="fill_parent"
     android:weightSum="1"
     android:fitsSystemWindows="true"
-    tools:context="com.example.dell.sccs_app.FragmentDesign.MapFragment">
+    tools:context="com.example.dell.sccs_app.FragmentDesign.ProjectFragment">
 
     <TextView
         android:id="@+id/tempProject"

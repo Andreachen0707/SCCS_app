@@ -5,11 +5,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.CookieSyncManager;
 
+import com.example.dell.sccs_app.Bean.AidiBean;
 import com.example.dell.sccs_app.Bean.DeviceListBean;
 import com.example.dell.sccs_app.Bean.ElectricListBean;
 import com.example.dell.sccs_app.Bean.LampListBean;
 import com.example.dell.sccs_app.Bean.LcuBean;
 import com.example.dell.sccs_app.Bean.Lcu_lampBean;
+import com.example.dell.sccs_app.Bean.OpenBean;
 import com.example.dell.sccs_app.Bean.ProjectBean;
 import com.example.dell.sccs_app.Bean.StationBean;
 import com.example.dell.sccs_app.Util.Md5Util;
@@ -46,17 +48,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.dell.sccs_app.StaticValue.AidiData;
 import static com.example.dell.sccs_app.StaticValue.ElectricListData;
 import static com.example.dell.sccs_app.StaticValue.LampListData;
 import static com.example.dell.sccs_app.StaticValue.LcuData;
 import static com.example.dell.sccs_app.StaticValue.Lcu_lampData;
+import static com.example.dell.sccs_app.StaticValue.OpenData;
 import static com.example.dell.sccs_app.StaticValue.StationData;
 import static com.example.dell.sccs_app.StaticValue.addContrallor;
 import static com.example.dell.sccs_app.StaticValue.addLamp;
+import static com.example.dell.sccs_app.StaticValue.askAidiUrl;
 import static com.example.dell.sccs_app.StaticValue.askConcentratorUrl;
 import static com.example.dell.sccs_app.StaticValue.askElectricUrl;
 import static com.example.dell.sccs_app.StaticValue.askLampUrl;
 import static com.example.dell.sccs_app.StaticValue.askLucUrl;
+import static com.example.dell.sccs_app.StaticValue.askOpenUrl;
 import static com.example.dell.sccs_app.StaticValue.askProjectListUrl;
 import static com.example.dell.sccs_app.StaticValue.connectState;
 import static com.example.dell.sccs_app.StaticValue.deletestation;
@@ -377,14 +383,19 @@ public class LoginProcess extends AppCompatActivity {
             case 7://add controller
                 link = addContrallor;
                 projectId = projectData.get(projectTemp).getId();
-                body = "{\"pid\":\""+projectId+"\",\"name\":\""+name+"\",\"cuid\":\""+cuid+"\",\"ctype\":1,\"cmodel\":\""+deviceListData.get(1).getModelId()+"\",\"devices\":[{\"deviceType\":2,\"modelId\":\""+ElectricListData.get(0).getModelId()+"\",\"name\":\"Built-in METER\"}],\"lat\":"+lat+",\"lng\":"+lng+"}";
+                //body = "{\"pid\":\""+projectId+"\",\"name\":\""+name+"\",\"cuid\":\""+cuid+"\",\"ctype\":1,\"cmodel\":\""+deviceListData.get(1).getModelId()+"\",\"devices\":[{\"deviceType\":2,\"modelId\":\""+ElectricListData.get(0).getModelId()+"\",\"name\":\"Built-in METER\"}],\"lat\":"+lat+",\"lng\":"+lng+"}";
+                body = "{\"pid\":\""+projectId+"\",\"name\":\""+name+"\",\"cuid\":\""+cuid+"\",\"ctype\":1,\"cmodel\":\""+deviceListData.get(1).getModelId()+"\",\"devices\":[{\"deviceType\":2,\"modelId\":\""+ElectricListData.get(0).getModelId()+"\",\"name\":\"Built-in METER\"},{\"deviceType\":3,\"modelId\":\""+AidiData.get(0).getModelId()+ "\",\"name\":\"Built-in 2AI-4DI-4DO\"}],\"lat\":"+lat+",\"lng\":"+lng+"}";
+
                 Log.i("body" ,body);
                 break;
 
             case 8:
                 link = addLamp;
                 projectId = projectData.get(projectTemp).getId();
-                body = "{\"luid\":\""+luid+"\",\"lampmodel\":\""+lmodelid+"\",\"pid\":\""+projectId+"\",\"sid\":\""+ssid+"\",\"cuid\":\"" + cuid + "\",\"ctype\":1,\"name\":\""+name+"\",\"channel\":1,\"lcumodel\":\""+lcumodelid+"\",\"kmId\":null,\"lat\":"+lat+",\"lng\":"+lng+",\"dirId\":\""+ssid+"\"}";
+                //body = "{\"luid\":\""+luid+"\",\"lampmodel\":\""+lmodelid+"\",\"pid\":\""+projectId+"\",\"sid\":\""+ssid+"\",\"cuid\":\""+cuid+"\",\"ctype\":1,\"name\":\""+name+"\",\"channel\":1,\"lcumodel\":\""+lcumodelid+"\",\"kmId\":null,\"lat\":"+lat+",\"lng\":"+lng+",\"dirId\":\""+ssid+"\"}";
+
+                body = "{\"luid\":\""+luid+"\",\"lampmodel\":\""+lmodelid+"\",\"pid\":\""+projectId+"\",\"sid\":\""+ssid+"\",\"cuid\":\""+cuid+"\",\"ctype\":1,\"name\":\""+name+"\",\"channel\":1,\"lcumodel\":\""+lcumodelid+"\",\"kmId\":\""+OpenData.get(0).getDeviceId()+"\",\"lat\":"+lat+",\"lng\":"+lng+",\"dirId\":\""+ssid+"\"}";
+
                 Log.i("type 8 body",body);
                 break;
 
@@ -401,6 +412,18 @@ public class LoginProcess extends AppCompatActivity {
             case 10:
                 link = deletestation;
                 body = "{\"wheres\":[{\"k\":\"stationId\",\"o\":\"=\",\"v\":\""+ssid+"\"}],\"orders\":[]}";
+                break;
+
+            //要开关信息
+            case 11:
+                projectId = projectData.get(projectTemp).getId();
+                link = askAidiUrl;
+                body = "{\"wheres\":[{\"k\":\"asDefault\",\"o\":\"=\",\"v\":true},{\"k\":\"projectId\",\"o\":\"=\",\"v\":\""+projectId+"\"}],\"orders\":[]}";
+                break;
+
+            case 12:
+                link = askOpenUrl;
+                body = "{\"wheres\":[{\"k\":\"stationId\",\"o\":\"=\",\"v\":\""+ssid+"\"},{\"k\":\"deviceType\",\"o\":\"=\",\"v\":3},{\"k\":\"type\",\"o\":\"=\",\"v\":3}],\"orders\":[{\"k\":\"dadd\",\"v\":\"ASC\"},{\"k\":\"dch\",\"v\":\"ASC\"}]}";
                 break;
 
             default:
@@ -535,6 +558,24 @@ public class LoginProcess extends AppCompatActivity {
             for (JsonElement user : jsonArray){
                 Lcu_lampBean lcu_lamp = gson.fromJson(user,Lcu_lampBean.class);
                 Lcu_lampData.add(i,lcu_lamp);
+                i++;
+            }
+        }
+        else if (type == 11){
+            AidiData.clear();
+            int i = 0;
+            for (JsonElement user : jsonArray){
+                AidiBean aidi = gson.fromJson(user,AidiBean.class);
+                AidiData.add(i,aidi);
+                i++;
+            }
+        }
+        else if(type==12){
+            OpenData.clear();
+            int i = 0;
+            for (JsonElement user : jsonArray){
+                OpenBean open = gson.fromJson(user,OpenBean.class);
+                OpenData.add(i,open);
                 i++;
             }
         }
