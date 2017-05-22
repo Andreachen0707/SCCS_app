@@ -10,6 +10,7 @@ public class Lcu_lampBean {
     private String cuid;
     private Integer ctype;
     private String luid;
+    private String lid;
     private String name;
     private double lat;
     private double lng;
@@ -53,6 +54,14 @@ public class Lcu_lampBean {
 
     public void setLuid(String luid) {
         this.luid = luid;
+    }
+
+    public String getLid(){
+        return lid;
+    }
+
+    public void setLid(String lid){
+        this.lid = lid;
     }
 
     public String getName() {

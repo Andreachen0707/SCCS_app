@@ -118,6 +118,7 @@ public class MapFragment extends Fragment {
     private Marker point;//点击后出现的小点点
     private BitmapDescriptor bitmap_onclick;
     private boolean controllclick;
+    private boolean lampclick;
 
 
     private EditText NAME;
@@ -136,12 +137,14 @@ public class MapFragment extends Fragment {
     private String cuid;
     private String ssid;
     private String luid;
+    private String lid;//删除的时候要用的一个参数
     private String lmodel; //灯具型号 多少瓦的那个
     private String lmodelid;
     private String lcumodel; //单灯控制器型号，可以控制多少灯那个
     private String lcumodelid;
     private String cuid_now;//当前被点击的控制器的cuid
     private String ssid_now;//当前被点击的控制器的ssid
+    private String luid_now;//当前被点击的灯的id
     private int numberoflamp;//默认灯具名字
     private int numberofcontrol;//默认集中器名字
 
@@ -252,7 +255,7 @@ public class MapFragment extends Fragment {
                     markerlist.get(i).remove();
                 }
                 Log.i("length test",String.valueOf(markerlist.size()));
-                mrefresh.setParam(5,null,null,null,null,null,null,0,0);
+                mrefresh.setParam(5,null,null,null,null,null,null,null,0,0);
                 new Thread(mrefresh).start();
                 handler.postDelayed(new maphandler(),1000);
             }
@@ -273,6 +276,7 @@ public class MapFragment extends Fragment {
         numberoflamp = 1;
         numberofcontrol = 1;
         controllclick = false;
+        lampclick = false;
         markerlist = new ArrayList<Marker>();
         lampmarkerlist = new ArrayList<Marker>();
 
@@ -307,7 +311,6 @@ public class MapFragment extends Fragment {
             @Override
             public void onMapStatusChangeStart(MapStatus arg0) {
                 point.setPosition(initpoint);
-              Log.i("children count",String.valueOf(mAddlist.getChildCount()));
                 if(controllclick){
                     mAddControllor.setIcon(R.drawable.icons_controller_gray);
                     mAddControllor.setTitle(getString(R.string.controller));
@@ -320,6 +323,10 @@ public class MapFragment extends Fragment {
 
                     mLampoff.setVisibility(View.INVISIBLE);
                     mdelete.setEnabled(false);
+                }
+
+                if(lampclick){
+
                 }
                 /*mAddControllor.setIcon(R.drawable.icons_controller_gray);
                 mAddControllor.setTitle(getString(R.string.controller));
@@ -353,6 +360,10 @@ public class MapFragment extends Fragment {
             @Override
             public void onMapStatusChangeFinish(MapStatus arg0) {
                 controllclick = false;
+                lampclick = false;
+                if(zoomLevel<18){
+                    //把灯的标记删除
+                }
                 Log.i("finish","in");
             }
 
@@ -566,10 +577,10 @@ public class MapFragment extends Fragment {
                     name = NAME.getText().toString();
                     luid = UID.getText().toString();
 
-                    upload.setParam(8,name,cuid_now,ssid_now,luid,lmodelid,lcumodelid,gpslatitude,gpslongitude);
+                    upload.setParam(8,name,cuid_now,ssid_now,luid,null,lmodelid,lcumodelid,gpslatitude,gpslongitude);
                     numberoflamp++;
                     new Thread(upload).start();
-                    mapAnnotation(name,cuid_now,null,luid,0,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
+                    mapAnnotation(name,cuid_now,null,luid,null,0,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
                     bottomDialog.dismiss();
                 }
             });
@@ -592,10 +603,10 @@ public class MapFragment extends Fragment {
                     //添加集中器的语句
                     name = NAME.getText().toString();
                     cuid = UID.getText().toString();
-                    upload.setParam(7,name,cuid,name,null,null,null,gpslatitude,gpslongitude);
+                    upload.setParam(7,name,cuid,name,null,null,null,null,gpslatitude,gpslongitude);
                     numberofcontrol++;
                     new Thread(upload).start();
-                    mrefresh.setParam(5,null,null,null,null,null,null,0,0);
+                    mrefresh.setParam(5,null,null,null,null,null,null,null,0,0);
                     new Thread(mrefresh).start();
                     handler.post(new maphandler());
                     //mapAnnotation(name,cuid,null,null,1,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
@@ -689,7 +700,7 @@ public class MapFragment extends Fragment {
 
     }
 
-    public void mapAnnotation(String name,String cuid,String ssid,String luid,int type,double lat,double lng)
+    public void mapAnnotation(String name,String cuid,String ssid,String luid,String lid,int type,double lat,double lng)
     {
         Marker marker = null;
         //定义Maker坐标点
@@ -713,6 +724,7 @@ public class MapFragment extends Fragment {
         bundle.putSerializable("cuid",cuid);
         bundle.putSerializable("luid",luid);
         bundle.putSerializable("ssid",ssid);
+        bundle.putSerializable("lid",lid);
         //在地图上添加Marker，并显示
         marker = (Marker) mBaidumap.addOverlay(option);
         marker.setExtraInfo(bundle);
@@ -734,30 +746,28 @@ public class MapFragment extends Fragment {
          */
         public boolean onMarkerClick(Marker marker){
             InfoWindow mInfoWindow;
-
-
-
             point.setPosition(marker.getPosition());
             point.setToTop();
 
             Bundle res = marker.getExtraInfo();
             String a = res.getString("cuid");
+            final String type = res.getString("type");
             cuid_now = a;
             ssid_now = res.getString("ssid");
+            luid_now = res.getString("luid");
+            lid = res.getString("lid");
             Log.i("ssid now",ssid_now);
 
             //点击后动态改变浮动按钮的功能
-
             //如果点击的是集中器的按钮，改变按钮的布局
-            if("1".equals(res.getString("type"))) {
+            if("1".equals(type)) {
+                queryopen.setParam(12,null,null,ssid_now,null,null,null,null,0,0);
+                new Thread(queryopen).start();
 
-
-                mLamp.setParam(9,null,null,ssid_now,null,null,null,0,0);
-                new Thread(mLamp).start();
                 //画灯
-                if(zoomLevel>19){
-                    queryopen.setParam(12,null,null,ssid_now,null,null,null,0,0);
-                    new Thread(queryopen).start();
+                if(zoomLevel>18){
+                    mLamp.setParam(9,null,null,ssid_now,null,null,null,null,0,0);
+                    new Thread(mLamp).start();
                 }
 
                 mAddControllor.setIcon(R.drawable.icon_lamp_on_large);
@@ -798,9 +808,58 @@ public class MapFragment extends Fragment {
                 mdelete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        alert();
+                        alert(type,null);
                     }
                 });
+            }
+
+            else{
+                //改变浮动按钮的内容
+                mAddLamp.setIcon(R.drawable.icon_lamp_on_large);
+                mAddLamp.setTitle("Turn on");
+                mAddControllor.setIcon(R.drawable.icon_lamp_off_large);
+                mAddControllor.setTitle("Turn off");
+                mLampoff.setVisibility(View.VISIBLE);
+                mLampoff.setEnabled(true);
+                mLampoff.setIcon(R.drawable.icons_lamp_adjust_large);
+                mLampoff.setTitle("Light adjust");
+                mLampadjust.setVisibility(View.VISIBLE);
+                mLampadjust.setEnabled(true);
+                mLampadjust.setIcon(R.drawable.icon_delete);
+                mLampadjust.setTitle("Delete");
+
+                lampclick = true;
+
+                mAddLamp.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        testClient.senddata("ctrl-lcu", "turn-on", "1", "zh_CN", "" + cuid_now + "", "1", "{\"sid\":\""+ssid_now+"\",\"cast\":3,\"gnum\":0,\"luids\":[\""+luid_now+"\"],\"chs\":[1],\"delayTime\":0}");
+                    }
+                });
+                mAddControllor.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        testClient.senddata("ctrl-lcu", "turn-off", "1", "zh_CN", "" + cuid_now + "", "1", "{\"sid\":\""+ssid_now+"\",\"cast\":3,\"gnum\":0,\"luids\":[\""+luid_now+"\"],\"chs\":[1],\"delayTime\":0}");
+                    }
+                });
+
+                mLampoff.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //那个50是调光值
+                        testClient.senddata("ctrl-lcu", "dimming", "1", "zh_CN", "" + cuid_now + "", "1", "{\"sid\":\""+ssid_now+"\",\"cast\":3,\"gnum\":0,\"luids\":[\""+luid_now+"\"],\"chs\":[1],\"dims\":[50],\"delayTime\":0}");
+                    }
+                });
+
+                mLampadjust.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //那个50是调光值
+                        alert(type,lid);
+                    }
+                });
+
+
             }
 
 
@@ -863,16 +922,19 @@ public class MapFragment extends Fragment {
             if("10".equals(String.valueOf(type))) {
                 Toast.makeText(getActivity(), "Delete Successful", Toast.LENGTH_LONG).show();
                 point.setPosition(new LatLng(0,0));
-                mrefresh.setParam(5,null,null,null,null,null,null,0,0);
+                mrefresh.setParam(5,null,null,null,null,null,null,null,0,0);
                 new Thread(mrefresh).start();
                 handler.post(new maphandler());
             }
 
+
+            if("13".equals(String.valueOf(type))){
+                Toast.makeText(getActivity(), "Delete Successful", Toast.LENGTH_LONG).show();
+
+            }
+
             if("9".equals(String.valueOf(type))){
-                for(int i = 0;i<Lcu_lampData.size();i++) {
-                    mapAnnotation(Lcu_lampData.get(i).getName(),Lcu_lampData.get(i).getCuid(),Lcu_lampData.get(i).getSid(),Lcu_lampData.get(i).getLuid(),
-                            0,Lcu_lampData.get(i).getLat(),Lcu_lampData.get(i).getLng());
-                }
+                handler.post(new Lamphandler());
             }
 
             if("".equals(val))
@@ -905,17 +967,19 @@ public class MapFragment extends Fragment {
         private String cuid;
         private String ssid;
         private String luid;
+        private String lid;
         private String lmodelid;
         private String lcumodelid;
         private double lat;
         private double lng;
-        public void setParam(int type,String name,String cuid,String ssid,String luid,String lmodelid,String lcumodelid,double lat,double lng)
+        public void setParam(int type,String name,String cuid,String ssid,String luid,String lid,String lmodelid,String lcumodelid,double lat,double lng)
         {
             this.type = type;
             this.name = name;
             this.cuid = cuid;
             this.ssid = ssid;
             this.luid = luid;
+            this.lid = lid;
             this.lmodelid = lmodelid;
             this.lcumodelid = lcumodelid;
             this.lat = lat;
@@ -923,7 +987,7 @@ public class MapFragment extends Fragment {
         }
         public void run()
         {
-            String res = getProject(type,name,cuid,ssid,luid,lmodelid,lcumodelid,lat,lng);
+            String res = getProject(type,name,cuid,ssid,luid,lid,lmodelid,lcumodelid,lat,lng);
             Message msg = new Message();
             Bundle data = new Bundle();
             data.putString("value", res);
@@ -953,7 +1017,7 @@ public class MapFragment extends Fragment {
                     slatitude = desLatLng.latitude;
                     slongitude = desLatLng.longitude;
 
-                    mapAnnotation(StationData.get(t).getName(),StationData.get(t).getCuid(),StationData.get(t).getSid(),null,1,slatitude,slongitude);
+                    mapAnnotation(StationData.get(t).getName(),StationData.get(t).getCuid(),StationData.get(t).getSid(),null,null,1,slatitude,slongitude);
                 }
             }
             else
@@ -966,33 +1030,38 @@ public class MapFragment extends Fragment {
         public void run()
         {
             //初始化在地图上标记
-                for(int t = 0;t<StationData.size();t++) {
-                    double slatitude = StationData.get(t).getLat();
-                    double slongitude = StationData.get(t).getLng();
 
-                    LatLng sourceLatLng = new LatLng(slatitude,slongitude);
-                    CoordinateConverter converter  = new CoordinateConverter();
-                    converter.from(CoordinateConverter.CoordType.GPS);
-                    // sourceLatLng待转换坐标
-                    converter.coord(sourceLatLng);
-                    LatLng desLatLng = converter.convert();
-                    slatitude = desLatLng.latitude;
-                    slongitude = desLatLng.longitude;
+            for(int i = 0;i<Lcu_lampData.size();i++) {
+                Log.i("draw lamp",String.valueOf(Lcu_lampData.size()));
+                double slatitude = Lcu_lampData.get(i).getLat();
+                double slongitude = Lcu_lampData.get(i).getLng();
 
-                    mapAnnotation(StationData.get(t).getName(),StationData.get(t).getCuid(),StationData.get(t).getSid(),null,1,slatitude,slongitude);
-                }
+                LatLng sourceLatLng = new LatLng(slatitude,slongitude);
+                CoordinateConverter converter  = new CoordinateConverter();
+                converter.from(CoordinateConverter.CoordType.GPS);
+                // sourceLatLng待转换坐标
+                converter.coord(sourceLatLng);
+                LatLng desLatLng = converter.convert();
+                slatitude = desLatLng.latitude;
+                slongitude = desLatLng.longitude;
+                mapAnnotation(Lcu_lampData.get(i).getName(),Lcu_lampData.get(i).getCuid(),Lcu_lampData.get(i).getSid(),Lcu_lampData.get(i).getLuid(),Lcu_lampData.get(i).getLid(),0,slatitude,slongitude);
+            }
         }
     }
 
-    private void alert(){
+    private void alert(String type,String lid){
+        if("1".equals(type))
+            //发送删除指令
+            upload.setParam(10,null,null,ssid_now,null,null,null,null,0,0);
+        else
+            upload.setParam(13,null,null,null,null,lid,null,null,0,0);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Delete with caution");
         builder.setTitle("Warning");
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //发送删除指令
-                upload.setParam(10,null,null,ssid_now,null,null,null,0,0);
+
                 new Thread(upload).start();
                 /*mrefresh.setParam(5,null,null,null,null,null,null,0,0);
                 new Thread(mrefresh).start();

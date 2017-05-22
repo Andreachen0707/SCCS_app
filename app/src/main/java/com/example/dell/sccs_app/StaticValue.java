@@ -46,6 +46,7 @@ public class StaticValue {
     public static String addlamp2 = "http://121.40.34.92:7070/api/json?cmd=lamps&ctrl=add&version=1&lang=zh_CN&sid=";
     public static String stationquery = "http://121.40.34.92:7070/api/json?cmd=station&ctrl=get&version=1&lang=zh_CN&sid=";
     public static String deletestation = "http://121.40.34.92:7070/api/json?cmd=station&ctrl=deletes&version=1&lang=zh_CN&sid=";
+    public static String deletelamp = "http://121.40.34.92:7070/api/json?cmd=lamp&ctrl=deletes&version=1&lang=zh_CN&sid=";
 
     //每个控制柜的下属灯的信息
     public static String lampquery = "http://121.40.34.92:7070/api/json?cmd=map-item&ctrl=get-lamps&version=1&lang=zh_CN&sid=";

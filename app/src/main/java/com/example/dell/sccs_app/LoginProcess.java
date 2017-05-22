@@ -65,6 +65,7 @@ import static com.example.dell.sccs_app.StaticValue.askLucUrl;
 import static com.example.dell.sccs_app.StaticValue.askOpenUrl;
 import static com.example.dell.sccs_app.StaticValue.askProjectListUrl;
 import static com.example.dell.sccs_app.StaticValue.connectState;
+import static com.example.dell.sccs_app.StaticValue.deletelamp;
 import static com.example.dell.sccs_app.StaticValue.deletestation;
 import static com.example.dell.sccs_app.StaticValue.deviceListData;
 import static com.example.dell.sccs_app.StaticValue.infostate_1;
@@ -339,7 +340,7 @@ public class LoginProcess extends AppCompatActivity {
         return axWebSID;
     }
 
-    public static String getProject(int con_type,String name,String cuid,String ssid,String luid,String lmodelid,String lcumodelid,double lat,double lng) {
+    public static String getProject(int con_type,String name,String cuid,String ssid,String luid,String lmodelid,String lampid,String lcumodelid,double lat,double lng) {
         String body = "";
         String projectId = "";
         String link = "";
@@ -425,6 +426,10 @@ public class LoginProcess extends AppCompatActivity {
                 link = askOpenUrl;
                 body = "{\"wheres\":[{\"k\":\"stationId\",\"o\":\"=\",\"v\":\""+ssid+"\"},{\"k\":\"deviceType\",\"o\":\"=\",\"v\":3},{\"k\":\"type\",\"o\":\"=\",\"v\":3}],\"orders\":[{\"k\":\"dadd\",\"v\":\"ASC\"},{\"k\":\"dch\",\"v\":\"ASC\"}]}";
                 break;
+
+            case 13:
+                link = deletelamp;
+                body = "{\"wheres\":[{\"k\":\"lampId\",\"o\":\"=\",\"v\":\""+lampid+"\"}],\"orders\":[]}";
 
             default:
                 break;
