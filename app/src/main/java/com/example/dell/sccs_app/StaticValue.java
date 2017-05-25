@@ -22,6 +22,7 @@ public class StaticValue {
     public static boolean infostate_1 = false;
     public static boolean infostate_2 = false;
     public static boolean project_get = false;
+    public static boolean first_in = false;
     public static String set_port = "121.40.34.92:7070";
     public static String basicURL = "http://"+set_port;
     public static String connectURL = basicURL+"/api/json?cmd=login&ctrl=user&version=1&lang=zh_CN";
@@ -68,4 +69,5 @@ public class StaticValue {
     public static ArrayList<Lcu_lampBean> Lcu_lampData = new ArrayList<>();
     public static int projectTemp = 0;
     public static int addaction = 0;
+    public static int test_ssid = 0;
 }

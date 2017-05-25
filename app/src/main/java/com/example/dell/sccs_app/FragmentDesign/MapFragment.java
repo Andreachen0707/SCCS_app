@@ -775,6 +775,15 @@ public class MapFragment extends Fragment {
             if("1".equals(type)) {
                 point.setPosition(marker.getPosition());
                 point.setToTop();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("type",String.valueOf(type));
+                bundle.putSerializable("info", res.getString("info"));
+                bundle.putSerializable("cuid",res.getString("cuid"));
+                bundle.putSerializable("luid",res.getString("luid"));
+                bundle.putSerializable("ssid",res.getString("ssid"));
+                bundle.putSerializable("lid",res.getString("lid"));
+                point.setExtraInfo(bundle);
+
                 queryopen.setParam(12,null,null,ssid_now,null,null,null,null,0,0);
                 new Thread(queryopen).start();
 
@@ -788,10 +797,13 @@ public class MapFragment extends Fragment {
                 mAddControllor.setTitle("Turn on");
 
                 mLampoff.setVisibility(View.VISIBLE);
+                mLampoff.setIcon(R.drawable.icon_lamp_off_large);
                 mLampoff.setEnabled(true);
                 mLampadjust.setVisibility(View.VISIBLE);
+                mLampadjust.setIcon(R.drawable.icons_lamp_adjust_large);
                 mLampadjust.setEnabled(true);
                 mdelete.setVisibility(View.VISIBLE);
+                mdelete.setIcon(R.drawable.icon_delete);
                 mdelete.setEnabled(true);
 
                 controllclick = true;
@@ -1096,7 +1108,6 @@ public class MapFragment extends Fragment {
         });
         builder.create().show();
     }
-
 }
 
 

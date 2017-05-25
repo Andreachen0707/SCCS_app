@@ -185,7 +185,6 @@ public class Project extends AppCompatActivity
 
         connectToServer("121.40.34.92","7070","1");
 
-
         initViews();
         initSet();
         configview();
