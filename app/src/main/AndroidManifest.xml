@@ -228,7 +228,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Project_list"></activity>
+        <activity android:name=".Project_list" />
+        <activity android:name=".history"></activity>
     </application>
 
 </manifest>

@@ -125,7 +125,16 @@ public class Project_list extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     private void config(){
+
         setSupportActionBar(mToolbar);
+        mToolbar.setNavigationIcon(R.drawable.ic_action_back);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(Project_list.this,Project.class);
+                startActivity(intent);
+            }
+        });
 
 
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), mtest, mFragments);

@@ -99,7 +99,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         //login
         //connect();
-        mResultTextView = (TextView)findViewById(R.id.mResultTextView);
         headshot = ((SpringingImageView) findViewById(R.id.headshot)).setIsCircleImage(true);
         headshot.getSpringingHandlerController().addSpringingHandler(new SpringingTouchScaleHandler(this, headshot));
 
@@ -149,13 +148,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button tempt = (Button) findViewById(R.id.tempt);
-        tempt.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new SpringingNotificationRotateHandler(LoginActivity.this, headshot).start(1);
-            }
-        });
+
         new SpringingNotificationRotateHandler(this, headshot).start(1);
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);

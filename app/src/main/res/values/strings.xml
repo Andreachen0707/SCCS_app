@@ -61,4 +61,9 @@
 
     <!--String related to project list-->
     <string name="Project_detail"> 项目总览</string>
+    <string name="alarm">警报接收</string>
+    <string name="logout">退出登录</string>
+    <string name="hist">历史操作</string>
+    <string name="uploadnum">今日上传</string>
+    <string name="deletenum">今日删除</string>
 </resources>

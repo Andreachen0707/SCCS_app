@@ -68,7 +68,7 @@ public final class CameraManager {
     this.configManager = new CameraConfigurationManager(context);
     previewCallback = new PreviewCallback(configManager);
   }
-  
+
   /**
    * Opens the camera driver and initializes the hardware parameters.
    *
@@ -233,7 +233,7 @@ public final class CameraManager {
     }
     return framingRect;
   }
-  
+
   private static int findDesiredDimensionInRange(int resolution, int hardMin, int hardMax) {
     int dim = 5 * resolution / 8; // Target 5/8 of each dimension
     if (dim < hardMin) {
@@ -273,7 +273,7 @@ public final class CameraManager {
     return framingRectInPreview;
   }
 
-  
+
   /**
    * Allows third party apps to specify the camera ID, rather than determine
    * it automatically based on available cameras and their orientation.
@@ -283,12 +283,12 @@ public final class CameraManager {
   public synchronized void setManualCameraId(int cameraId) {
     requestedCameraId = cameraId;
   }
-  
+
   /**
    * Allows third party apps to specify the scanning rectangle dimensions, rather than determine
    * them automatically based on screen resolution.
    *
-   * @param width The width in pixels to scan.
+   * @param width  The width in pixels to scan.
    * @param height The height in pixels to scan.
    */
   public synchronized void setManualFramingRect(int width, int height) {
@@ -315,8 +315,8 @@ public final class CameraManager {
    * A factory method to build the appropriate LuminanceSource object based on the format
    * of the preview buffers, as described by Camera.Parameters.
    *
-   * @param data A preview frame.
-   * @param width The width of the image.
+   * @param data   A preview frame.
+   * @param width  The width of the image.
    * @param height The height of the image.
    * @return A PlanarYUVLuminanceSource instance.
    */
@@ -327,7 +327,7 @@ public final class CameraManager {
     }
     // Go ahead and assume it's YUV rather than die.
     return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
-                                        rect.width(), rect.height(), false);
+            rect.width(), rect.height(), false);
   }
 
 }

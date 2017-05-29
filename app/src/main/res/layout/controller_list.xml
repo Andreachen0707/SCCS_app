@@ -19,14 +19,10 @@
         <ListView
             android:id="@+id/control_list_1"
             android:layout_width="match_parent"
-            android:layout_height="100dp">
-        </ListView>
-
-        <ListView
-            android:id="@+id/control_list"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </ListView>
+
+
 
 
     </android.support.v4.widget.SwipeRefreshLayout>

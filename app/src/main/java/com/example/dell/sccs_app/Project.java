@@ -29,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -165,6 +166,7 @@ public class Project extends AppCompatActivity
     private DrawerLayout mDrawerLayout;
     private CoordinatorLayout mCoordinatorLayout;
     private NavigationView mNavigationView;
+    private ImageButton logout_button;
 
     private ViewPager mViewPager;
     private ViewPagerAdapter mViewPagerAdapter;
@@ -257,6 +259,7 @@ public class Project extends AppCompatActivity
         mViewPager = (ViewPager) findViewById(R.id.id_viewpager);
         //mFloatingActionButton = (FloatingActionButton) findViewById(R.id.id_floatingactionbutton);
         mNavigationView =  (NavigationView) findViewById(R.id.nav_view);
+        logout_button = (ImageButton) findViewById(R.id.logout);
         connectType = 1;
         m1.setName(2);
         m2.setName(3);
@@ -316,6 +319,19 @@ public class Project extends AppCompatActivity
         //show_name.setText(username);
         onNavgationViewMenuItemSelected(mNavigationView);
 
+        logout_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                connectType = 0;
+                MyThread2 m4 = new MyThread2();
+                m4.setName(connectType);
+                new Thread(m4).start();
+                Intent intent = new Intent();
+                intent.setClass(Project.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), mTitles, mFragments);
         mViewPager.setAdapter(mViewPagerAdapter);
         // 设置ViewPager最大缓存的页面个数
@@ -345,23 +361,18 @@ public class Project extends AppCompatActivity
                     // Handle the camera action
                     //mAppBarLayout.addView(mTabLayout);
 
-                } else if (id == R.id.nav_gallery) {
+                } else if (id == R.id.nav_list) {
                     Intent intent = new Intent();
                     intent.setClass(Project.this,Project_list.class);
                     intent.putExtra("name",String.valueOf(item.getTitle()));
                     startActivity(intent);
-
-
                 }
-                else if (id == R.id.nav_manage) {
-                    //退出
-                    connectType = 0;
-                    MyThread2 m4 = new MyThread2();
-                    m4.setName(connectType);
-                    new Thread(m4).start();
+                else if (id == R.id.nav_history) {
                     Intent intent = new Intent();
-                    intent.setClass(Project.this, LoginActivity.class);
+                    intent.setClass(Project.this,history.class);
+                    intent.putExtra("name",String.valueOf(item.getTitle()));
                     startActivity(intent);
+                    //退出
                 }
 
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

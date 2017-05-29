@@ -4,7 +4,7 @@
     android:id="@+id/head_nav"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/background"
+    android:background="@drawable/back_5"
     android:gravity="bottom"
     android:orientation="vertical"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
@@ -17,18 +17,17 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_gravity="center|start"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
             android:paddingTop="@dimen/nav_header_vertical_spacing"
-            app:srcCompat="@drawable/icons" />
+            app:srcCompat="@drawable/user" />
 
         <TextView
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center|start"
-            android:layout_marginStart="10dp"
+            android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:textSize = "20dp"
             android:textStyle="normal"

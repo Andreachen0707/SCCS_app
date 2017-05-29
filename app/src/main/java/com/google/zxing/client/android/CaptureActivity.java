@@ -70,9 +70,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -127,6 +130,9 @@ public final class CaptureActivity extends AppCompatActivity implements SurfaceH
   private BeepManager beepManager;
   private AmbientLightManager ambientLightManager;
 
+  private ToggleButton flashlight;
+  private int status = 0;
+
   ViewfinderView getViewfinderView() {
     return viewfinderView;
   }
@@ -147,6 +153,8 @@ public final class CaptureActivity extends AppCompatActivity implements SurfaceH
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     setContentView(R.layout.capture);
 
+    flashlight = (ToggleButton)findViewById(R.id.flashlight);
+
     Toolbar toolbarsetting=(Toolbar) findViewById(toolbar);
     toolbarsetting.setTitle("");
     setSupportActionBar(toolbarsetting);
@@ -158,6 +166,18 @@ public final class CaptureActivity extends AppCompatActivity implements SurfaceH
         Intent intent = new Intent(CaptureActivity.this,Add_lamp.class);
         startActivity(intent);
         Toast.makeText(CaptureActivity.this,"UP",Toast.LENGTH_SHORT).show();
+      }
+    });
+
+    flashlight.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if(isChecked){
+          cameraManager.setTorch(true);
+        }
+        if(!isChecked){
+          cameraManager.setTorch(false);
+        }
       }
     });
 

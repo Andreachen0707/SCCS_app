@@ -70,4 +70,8 @@ public class StaticValue {
     public static int projectTemp = 0;
     public static int addaction = 0;
     public static int test_ssid = 0;
+    public static String numberlamp="0";
+    public static String numbercontrol = "0";
+    public static int deletelampnum = 0;
+    public static int deletecontrolnum = 0;
 }

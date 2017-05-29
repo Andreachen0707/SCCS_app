@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@drawable/back"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="center_horizontal"
     android:orientation="vertical"
@@ -13,7 +13,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
-        android:background="@color/background"
+        android:background="@android:color/transparent"
         app:popupTheme="@style/AppTheme.PopupOverlay"
         app:theme="@style/AppTheme.AppBarOverlay"
         android:weightSum="1">
@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="App"
+            android:text="SCCS"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="normal"
@@ -86,43 +86,86 @@
                 android:id = "@+id/headshot"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:src = "@drawable/icons"
+                android:src = "@drawable/user_1"
                 android:layout_marginBottom="40dp"/>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="260dp"
+        <LinearLayout
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center">
+                android:layout_gravity="center"
+                android:src = "@drawable/sign_in_new"
+                android:scaleType="center"
+                android:scaleX="0.6"
+                android:scaleY="0.6"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginStart="10dp"
+                android:orientation="horizontal"
+                android:background="@drawable/button"
+                android:alpha="0.5">
+
 
                 <AutoCompleteTextView
                     android:id="@+id/username"
-                    android:layout_width="match_parent"
+                    android:layout_width="180dp"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_email"
                     android:inputType="textEmailAddress"
+                    android:textColor="@android:color/black"
                     android:maxLines="1"
                     android:singleLine="true" />
 
-            </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+            </LinearLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="260dp"
+        <LinearLayout
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginTop="30dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center">
+                android:layout_gravity="center"
+                android:src = "@drawable/closed_lock"
+                android:scaleType="center"
+                android:scaleX="0.6"
+                android:scaleY="0.6"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/button"
+                android:alpha="0.5">
 
                 <EditText
                     android:id="@+id/password"
-                    android:layout_width="match_parent"
+                    android:layout_width="180dp"
                     android:layout_height="wrap_content"
+                    android:gravity="start"
                     android:hint="@string/prompt_password"
                     android:imeActionId="@+id/login"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
                     android:maxLines="1"
+                    android:textColor="@android:color/black"
                     android:singleLine="true" />
 
-            </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+            </LinearLayout>
 
             <Button
                 android:id="@+id/email_sign_in_button"
@@ -130,24 +173,10 @@
                 android:layout_gravity="center"
                 android:layout_width="260dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/button"
                 android:text="@string/action_sign_in"
                 android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/tempt"
-                style="?android:textAppearanceSmall"
-                android:layout_gravity="center"
-                android:layout_width="260dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="test"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/mResultTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </ScrollView>

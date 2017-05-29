@@ -74,6 +74,10 @@ import static com.example.dell.sccs_app.StaticValue.LcuData;
 import static com.example.dell.sccs_app.StaticValue.Lcu_lampData;
 import static com.example.dell.sccs_app.StaticValue.StationData;
 import static com.example.dell.sccs_app.StaticValue.addaction;
+import static com.example.dell.sccs_app.StaticValue.deletecontrolnum;
+import static com.example.dell.sccs_app.StaticValue.deletelampnum;
+import static com.example.dell.sccs_app.StaticValue.numbercontrol;
+import static com.example.dell.sccs_app.StaticValue.numberlamp;
 import static com.example.dell.sccs_app.Util.GPS_convert.bd09_To_Gps84;
 
 /**
@@ -116,7 +120,9 @@ public class MapFragment extends Fragment {
     private int lampindex;
 
     private Marker point;//点击后出现的小点点
+    private Marker point_lamp;
     private BitmapDescriptor bitmap_onclick;
+    private BitmapDescriptor bitmap_lamp;
     private boolean controllclick;
     private boolean lampclick;
 
@@ -192,7 +198,7 @@ public class MapFragment extends Fragment {
         mLampadjust.setTitle("Light adjust");
 
         mdelete.setSize(com.getbase.floatingactionbutton.FloatingActionButton.SIZE_MINI);
-        mdelete.setIcon(R.drawable.icon_delete);
+        mdelete.setIcon(R.drawable.icon_delete_new);
         mdelete.setColorNormalResId(R.color.white);
         mdelete.setColorPressedResId(R.color.instruction);
         mdelete.setTitle("Delete");
@@ -251,6 +257,7 @@ public class MapFragment extends Fragment {
             public void onClick(View view){
                 LatLng initpoint = new LatLng(0, 0);
                 point.setPosition(initpoint);
+                point_lamp.setPosition(initpoint);
                 for(int i=0;i<markerlist.size();i++){
                     markerlist.get(i).remove();
                 }
@@ -283,8 +290,13 @@ public class MapFragment extends Fragment {
 
 
         point = null;
+        point_lamp = null;
         bitmap_onclick = BitmapDescriptorFactory
-                .fromResource(R.drawable.icons_pin_controller_click);
+                .fromResource(R.drawable.ic_pin_controller_click);
+
+        bitmap_lamp = BitmapDescriptorFactory
+                .fromResource(R.drawable.ic_pin_lamp_click_new);
+
 
 
         //获取地图控件引用
@@ -302,6 +314,12 @@ public class MapFragment extends Fragment {
                 .position(initpoint)
                 .icon(bitmap_onclick);
         point = (Marker) mBaidumap.addOverlay(option);
+
+        OverlayOptions option2 = new MarkerOptions()
+                .position(initpoint)
+                .icon(bitmap_lamp);
+        point_lamp = (Marker) mBaidumap.addOverlay(option2);
+
         // 改变地图状态
         MapStatus mMapStatus = new MapStatus.Builder().zoom(15).build();
         MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
@@ -592,6 +610,7 @@ public class MapFragment extends Fragment {
 
                     upload.setParam(8,name,cuid_now,ssid_now,luid,null,lmodelid,lcumodelid,gpslatitude,gpslongitude);
                     numberoflamp++;
+                    numberlamp = String.valueOf(numberoflamp);
                     new Thread(upload).start();
                     mapAnnotation(name,cuid_now,null,luid,null,0,convertToDouble(GPS_1.getText().toString(),0.00),convertToDouble(GPS_2.getText().toString(),0.00));
                     bottomDialog.dismiss();
@@ -618,6 +637,7 @@ public class MapFragment extends Fragment {
                     cuid = UID.getText().toString();
                     upload.setParam(7,name,cuid,name,null,null,null,null,gpslatitude,gpslongitude);
                     numberofcontrol++;
+                    numbercontrol = String.valueOf(numberofcontrol);
                     new Thread(upload).start();
                     mrefresh.setParam(5,null,null,null,null,null,null,null,0,0);
                     new Thread(mrefresh).start();
@@ -721,11 +741,11 @@ public class MapFragment extends Fragment {
         //构建Marker图标
         if(type == 1) {
             bitmap = BitmapDescriptorFactory
-                    .fromResource(R.drawable.icons_pin_controller_new);
+                    .fromResource(R.drawable.ic_pin_controller_new);
         }
         if(type ==0){
             bitmap = BitmapDescriptorFactory
-                    .fromResource(R.drawable.icons_pin_lamp_new);
+                    .fromResource(R.drawable.ic_pin_lamp);
         }
         //构建MarkerOption，用于在地图上添加Marker
         OverlayOptions option = new MarkerOptions()
@@ -757,7 +777,7 @@ public class MapFragment extends Fragment {
          * 地图 Marker 覆盖物点击事件监听函数
          * @param marker 被点击的 marker
          */
-        public boolean onMarkerClick(Marker marker){
+        public boolean onMarkerClick(final Marker marker){
             InfoWindow mInfoWindow;
 
 
@@ -803,7 +823,7 @@ public class MapFragment extends Fragment {
                 mLampadjust.setIcon(R.drawable.icons_lamp_adjust_large);
                 mLampadjust.setEnabled(true);
                 mdelete.setVisibility(View.VISIBLE);
-                mdelete.setIcon(R.drawable.icon_delete);
+                mdelete.setIcon(R.drawable.icon_delete_new);
                 mdelete.setEnabled(true);
 
                 controllclick = true;
@@ -840,6 +860,9 @@ public class MapFragment extends Fragment {
             }
 
             else{
+
+                point_lamp.setPosition(marker.getPosition());
+                point_lamp.setToTop();
                 //改变浮动按钮的内容
                 controllclick  = false;
                 mAddLamp.setIcon(R.drawable.icon_lamp_on_large);
@@ -852,7 +875,7 @@ public class MapFragment extends Fragment {
                 mLampoff.setTitle("Light adjust");
                 mLampadjust.setVisibility(View.VISIBLE);
                 mLampadjust.setEnabled(true);
-                mLampadjust.setIcon(R.drawable.icon_delete);
+                mLampadjust.setIcon(R.drawable.icon_delete_new);
                 mLampadjust.setTitle("Delete");
 
                 mdelete.setVisibility(View.INVISIBLE);
@@ -886,6 +909,14 @@ public class MapFragment extends Fragment {
                     public void onClick(View v) {
                         //那个50是调光值
                         alert(type,lid);
+                    }
+                });
+
+                mdelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        alert(type,null);
+                        marker.remove();
                     }
                 });
 
@@ -952,6 +983,7 @@ public class MapFragment extends Fragment {
             if("10".equals(String.valueOf(type))) {
                 Toast.makeText(getActivity(), "Delete Successful", Toast.LENGTH_LONG).show();
                 point.setPosition(new LatLng(0,0));
+                point_lamp.setPosition(new LatLng(0,0));
                 mrefresh.setParam(5,null,null,null,null,null,null,null,0,0);
                 new Thread(mrefresh).start();
                 handler.post(new maphandler());
@@ -960,6 +992,7 @@ public class MapFragment extends Fragment {
 
             if("13".equals(String.valueOf(type))){
                 Toast.makeText(getActivity(), "Delete Successful", Toast.LENGTH_LONG).show();
+                point_lamp.setPosition(new LatLng(0,0));
 
             }
 
@@ -1017,7 +1050,7 @@ public class MapFragment extends Fragment {
         }
         public void run()
         {
-            String res = getProject(type,name,cuid,ssid,luid,lid,lmodelid,lcumodelid,lat,lng);
+            String res = getProject(type,name,cuid,ssid,luid,lmodelid,lid,lcumodelid,lat,lng);
             Message msg = new Message();
             Bundle data = new Bundle();
             data.putString("value", res);
@@ -1080,11 +1113,15 @@ public class MapFragment extends Fragment {
     }
 
     private void alert(String type,String lid){
-        if("1".equals(type))
+        if("1".equals(type)) {
             //发送删除指令
-            upload.setParam(10,null,null,ssid_now,null,null,null,null,0,0);
-        else
-            upload.setParam(13,null,null,null,null,lid,null,null,0,0);
+            upload.setParam(10, null, null, ssid_now, null, null, null, null, 0, 0);
+            deletecontrolnum = deletecontrolnum + 1;
+        }
+        else {
+            upload.setParam(13, null, null, null, null, lid, null, null, 0, 0);
+            deletelampnum = deletelampnum + 1;
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Delete with caution");
         builder.setTitle("Warning");
